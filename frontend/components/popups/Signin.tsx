@@ -1,10 +1,10 @@
 import React from 'react';
 import { CloseIcon } from '@chakra-ui/icons';
  
-export default function Signin(props: {onClose: any}){
+export default function Signin(props: {onCloseModal: any}){
 
     const handleCloseClick = () => {
-        props.onClose();
+        props.onCloseModal();
     };
 
   return(
@@ -46,6 +46,17 @@ export default function Signin(props: {onClose: any}){
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                   />
                 </div>
+              </div>
+              <div className="flex items-center">
+                  <input
+                    id="remember-me"
+                    name="remember-me"
+                    type="checkbox"
+                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                    Book only for me
+                  </label>
               </div>
               <div>
                 <button

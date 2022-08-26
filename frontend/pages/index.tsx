@@ -1,10 +1,8 @@
 import Navbar from "../components/layout/Navbar";
-// import Footer from "../components/layout/Footer";
 import Link from "next/link"
 import Signin from "../components/popups/Signin";
 import { useState } from "react";
 import Footer from "../components/layout/Footer";
-// import Create from "../components/popups/Create";
 
 export default function Home() {
   const [showModal, setShowModal] = useState(false);
@@ -20,12 +18,12 @@ export default function Home() {
           <h1 className="text-7xl ml-8 font-black"><span className="text-indigo-600">Book a stay</span> for <br/> your next hack.</h1>
           <p className=" ml-8 mt-10 text-xl font-black ">
           Because all hackers deserve a great place to hack!!</p>
-          <button className="border-4 border-black text-black shadow-[12px_12px_0_rgba(0,0,0,1)] font-black rounded-xl 
+          <a href="#upcoming"><button className="border-4 border-black text-black shadow-[12px_12px_0_rgba(0,0,0,1)] font-black rounded-xl 
           px-28 py-6 text-black text-2xl ml-8 mt-20 hover:scale-105 transition ease-in duration-240 hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180">
-            Browse stays
-          </button>
+            Upcoming Events
+          </button></a>
         </div>
-      {showModal ? <Signin onClose={() => setShowModal(false)}/> : '' }
+      {showModal ? <Signin onCloseModal={() => setShowModal(false)}/> : '' }
       <div style={{clipPath: "polygon(25% 0%, 100% 0%, 100% 100%, 0% 100%)"}} className="h-screen w-8/12 bg-background bg-cover bg-right z-0 shadow-[0px_20px_0_rgba(0,0,0,1)] fixed right-0 top-0 flex items-center">
       <div className="mt-8 absolute right-20  shadow-[20px_20px_0_rgba(0,0,0,1)] border-4 border-black rounded-2xl">
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 ">
@@ -110,17 +108,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center">
-                  <input
-                    id="remember-me"
-                    name="remember-me"
-                    type="checkbox"
-                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                  />
-                  <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                    Book only for me
-                  </label>
-              </div>
+
               <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                     Image
@@ -213,7 +201,7 @@ export default function Home() {
       </div>
     </div>
   
-    <div className="py-24 pb-36">
+    <div className="py-24 pb-36" id="upcoming">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl tracking-tight font-bold text-gray-900 sm:text-5xl sm:tracking-tight">

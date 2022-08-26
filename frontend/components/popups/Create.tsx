@@ -2,12 +2,12 @@ import React from 'react';
 import { CloseIcon } from '@chakra-ui/icons';
 import { useState } from 'react';
   
-export default function Create(props: {onClose: any}){
+export default function Create(props: {onCloseModal: any}){
 
     const [loggedIn, setLoggedIn] = useState(false)
 
     const handleCloseClick = () => {
-        props.onClose();
+        props.onCloseModal();
     };
     const logIn = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
