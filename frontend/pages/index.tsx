@@ -1,6 +1,6 @@
 import Navbar from "../components/layout/Navbar";
 import Link from "next/link"
-import Signin from "../components/popups/Signin";
+import AddStay from "../components/popups/AddStay";
 import React, { useState } from "react";
 import Footer from "../components/layout/Footer";
 import { FileUploader } from "react-drag-drop-files";
@@ -37,7 +37,7 @@ export default function Home() {
             Upcoming Events
           </button></a>
         </div>
-      {showModal ? <Signin onCloseModal={() => setShowModal(false)} link={link} price={price} eventName={eventName} spots={spots} image={image}/> : '' }
+      {showModal ? <AddStay onCloseModal={() => setShowModal(false)} link={link} price={price} eventName={eventName} spots={spots} image={image}/> : '' }
       <div style={{clipPath: "polygon(25% 0%, 100% 0%, 100% 100%, 0% 100%)"}} className="h-screen w-8/12 bg-stay2 bg-cover bg-right z-0 shadow-[0px_20px_0_rgba(0,0,0,1)] fixed right-0 top-0 flex items-center">
       <div className="mt-8 absolute right-20  shadow-[20px_20px_0_rgba(0,0,0,1)] border-4 border-black rounded-2xl">
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 ">
