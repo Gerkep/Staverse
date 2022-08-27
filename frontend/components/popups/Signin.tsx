@@ -1,11 +1,55 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { CloseIcon } from '@chakra-ui/icons';
+import internal from 'stream';
+import { BigNumber } from 'ethers';
+import { doc, collection, addDoc} from "firebase/firestore"; 
+import { db } from "../../firebase/clientApp";
+import { create, CID, IPFSHTTPClient } from "ipfs-http-client";
+
+const fileTypes = ["JPG", "PNG"];
+const projectId = process.env.NEXT_PUBLIC_IPFS_PROJECT_ID;
+const projectSecret = process.env.NEXT_PUBLIC_IPFS_API_KEY;
+const auth = `Basic ${Buffer.from(`${projectId}:${projectSecret}`).toString('base64')}`;
+const client = create({
+  host: 'ipfs.infura.io',
+  port: 5001,
+  protocol: 'https',
+  headers: {
+    authorization: auth,
+  },
+});
  
-export default function Signin(props: {onCloseModal: any}){
+export default function Signin(props: {onCloseModal: any, link: string, price: string, eventName: string, spots: string, image: string}){
+
+  const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState("");
 
     const handleCloseClick = () => {
         props.onCloseModal();
     };
+
+    const addStay = async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      const subdomain = 'https://staverse.infura-ipfs.io';
+      let URL = "";
+      if(props.image){
+        try {
+          const added = await client.add({ content: props.image });
+          URL = `${subdomain}/ipfs/${added.path}`;
+        } catch (error) {
+          console.log('Error uploading file to IPFS.');
+        }
+      }
+      await addDoc(collection(db, "Stays"), {
+        link: props.link,
+        price: props.price,
+        eventName: props.eventName,
+        spots: props.spots,
+        fullName: fullName,
+        email: email,
+        image: URL
+      });
+    }
 
   return(
     <div className='fixed z-50 w-full h-screen flex justify-center items-center  backdrop-blur-lg cursor-pointer' onClick={handleCloseClick}>
@@ -15,7 +59,7 @@ export default function Signin(props: {onCloseModal: any}){
             <div className='flex pb-8 w-full justify-center'>
                     <p className='text-center mt-8 text-gray-500'>Note: We need your email to add you to bookings and send details on your reservations.</p>
                 </div>
-            <form className="space-y-6" action="#" method="POST">
+            <form className="space-y-6" onSubmit={(e) => addStay(e)} method="POST">
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                   Email address
@@ -24,6 +68,8 @@ export default function Signin(props: {onCloseModal: any}){
                   <input
                     id="email"
                     name="email"
+                    onChange={(e) => setEmail(e.target.value)}
+                    value={email}
                     type="email"
                     autoComplete="email"
                     required
@@ -40,6 +86,8 @@ export default function Signin(props: {onCloseModal: any}){
                   <input
                     id="name"
                     name="name"
+                    onChange={(e) => setFullName(e.target.value)}
+                    value={fullName}
                     type="text"
                     autoComplete="current-name"
                     required

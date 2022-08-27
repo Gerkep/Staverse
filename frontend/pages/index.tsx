@@ -1,34 +1,48 @@
 import Navbar from "../components/layout/Navbar";
 import Link from "next/link"
 import Signin from "../components/popups/Signin";
-import { useState } from "react";
+import React, { useState } from "react";
 import Footer from "../components/layout/Footer";
+import { FileUploader } from "react-drag-drop-files";
+import { HiOutlinePhotograph } from "react-icons/hi";
+const fileTypes = ["JPG", "PNG"];
 
 export default function Home() {
   const [showModal, setShowModal] = useState(false);
+  const [link, setLink] = useState("");
+  const [price, setPrice] = useState("");
+  const [dates, setDates] = useState("");
+  const [eventName, setEventName] = useState("");
+  const [spots, setSpots] = useState("");
+  const [image, setImage] = useState<any>(null);
 
-  const addStay = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleChange = (image: any) => {
+    setImage(image);
+  };
+
+  const submitStay = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setShowModal(true);
+    setShowModal(true)
   }
+
   return (
     <>
       <Navbar style="dark"/>
       <div style={{marginTop: "25vh"}} className="w-1/2 fixed ">
           <h1 className="text-7xl ml-8 font-black"><span className="text-indigo-600">Book a stay</span> for <br/> your next hack.</h1>
-          <p className=" ml-8 mt-10 text-xl font-black ">
-          Because all hackers deserve a great place to hack!!</p>
+          <p className="w-4/6 ml-8 mt-10 text-2xl font-black ">
+          Because all hackers deserve a great place to stay during hackathon!</p>
           <a href="#upcoming"><button className="border-4 border-black text-black shadow-[12px_12px_0_rgba(0,0,0,1)] font-black rounded-xl 
-          px-28 py-6 text-black text-2xl ml-8 mt-20 hover:scale-105 transition ease-in duration-240 hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180">
+          px-24 py-6 text-black text-xl ml-8 mt-20 hover:scale-105 transition ease-in duration-240 hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180">
             Upcoming Events
           </button></a>
         </div>
-      {showModal ? <Signin onCloseModal={() => setShowModal(false)}/> : '' }
-      <div style={{clipPath: "polygon(25% 0%, 100% 0%, 100% 100%, 0% 100%)"}} className="h-screen w-8/12 bg-background bg-cover bg-right z-0 shadow-[0px_20px_0_rgba(0,0,0,1)] fixed right-0 top-0 flex items-center">
+      {showModal ? <Signin onCloseModal={() => setShowModal(false)} link={link} price={price} eventName={eventName} spots={spots} image={image}/> : '' }
+      <div style={{clipPath: "polygon(25% 0%, 100% 0%, 100% 100%, 0% 100%)"}} className="h-screen w-8/12 bg-stay2 bg-cover bg-right z-0 shadow-[0px_20px_0_rgba(0,0,0,1)] fixed right-0 top-0 flex items-center">
       <div className="mt-8 absolute right-20  shadow-[20px_20px_0_rgba(0,0,0,1)] border-4 border-black rounded-2xl">
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 ">
             <h2 className="text-center text-3xl font-bold">Add <span className="text-indigo-600">new stay</span></h2>
-            <form className="space-y-6 py-6" onSubmit={(e) => addStay(e)} method="POST">
+            <form className="space-y-6 py-6" onSubmit={(e) => submitStay(e)}>
               <div>
                 <label htmlFor="link" className="block text-sm font-medium text-gray-700">
                   Offer link
@@ -37,6 +51,8 @@ export default function Home() {
                   <input
                     id="link"
                     name="link"
+                    onChange={(e) => setLink(e.target.value)}
+                    value={link}
                     type="text"
                     autoComplete="link"
                     required
@@ -53,6 +69,8 @@ export default function Home() {
                     <input
                       id="price"
                       name="price"
+                      onChange={(e) => setPrice(e.target.value)}
+                      value={price}
                       type="number"
                       autoComplete="price"
                       required
@@ -79,12 +97,14 @@ export default function Home() {
               <div className="grid w-full grid-cols-2">
                 <div>
                   <label htmlFor="event" className="block text-sm font-medium text-gray-700">
-                    Event name
+                    Event
                   </label>
                   <div className="mt-1">
                     <input
                       id="event"
                       name="event"
+                      onChange={(e) => setEventName(e.target.value)}
+                      value={eventName}
                       type="text"
                       autoComplete="event"
                       required
@@ -100,6 +120,8 @@ export default function Home() {
                     <input
                       id="spots"
                       name="spots"
+                      onChange={(e) => setSpots(e.target.value)}
+                      value={spots}
                       type="number"
                       autoComplete="spots"
                       required
@@ -109,12 +131,23 @@ export default function Home() {
                 </div>
               </div>
 
-              <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                    Image
-                  </label>
-                  <div className="mt-1 h-24 w-full bg-gray-200 rounded-lg"></div>
-              </div>
+              <label htmlFor="spots" className="block text-sm font-medium text-gray-700">
+                    Image <span className="text-gray-400 font-light">optional</span>
+              </label>
+              <FileUploader handleChange={handleChange} name="file" types={fileTypes} multiple={false} label="Drop an image" >
+                {image ? 
+                <div className=" w-full border-4 border-gray-200 rounded-xl mt-2 pt-4 pb-6 cursor-pointer">
+                  <div className="w-full text-center text-gray-500">{image.name} <br />Uploaded sccessfully ✅</div>
+                </div>   
+                :
+                <div className=" w-full border-4 border-gray-200 rounded-xl mt-2 pt-4 pb-6 cursor-pointer">
+                  <div className="w-full flex justify-center">
+                    <HiOutlinePhotograph className="w-10 h-10 text-gray-300"/>
+                  </div>
+                  <div className="w-full text-center text-gray-500">Drop an image</div>
+                </div>             
+                }
+              </FileUploader>
 
               <div>
                 <button
@@ -201,7 +234,7 @@ export default function Home() {
       </div>
     </div>
   
-    <div className="py-24 pb-36" id="upcoming">
+    <div className="pt-24 pb-12" id="upcoming">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl tracking-tight font-bold text-gray-900 sm:text-5xl sm:tracking-tight">

@@ -40,7 +40,7 @@ const Navbar: React.FC<{style:string}> = ({style}) => {
         <Link href="/profile"><p className="mr-8 text-black text-xl font-bold  cursor-pointer hover:scale-105 transition ease-in duration-180">Profile</p></Link>
         }
         <div className="mr-8">
-         <ConnectButton showBalance={false}/>
+         <ConnectButton showBalance={false} />
         </div>
       </div>
       <div className="w-full absolute top-0 flex justify-end px-8 py-4 z-50">

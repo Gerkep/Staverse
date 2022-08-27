@@ -6,7 +6,7 @@ const navigation = [{name: "Privacy policy", href: "#"}, {name: "Twitter", href:
 
 export default function Navbar() {
     return (
-      <footer className="bg-white">
+      <footer className="bg-white mt-24">
       <div className="max-w-7xl mx-auto py-12 px-4 overflow-hidden sm:px-6 lg:px-8 border-t-4 border-gray-200">
         <nav className="-mx-5 -my-2 flex flex-wrap justify-center" aria-label="Footer">
         <div className="w-full h-24 flex justify-center ">
