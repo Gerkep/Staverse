@@ -9,6 +9,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { db } from "../../../firebase/clientApp";
 import {HiOutlinePhotograph} from "react-icons/hi";
 import Footer from "../../../components/layout/Footer";
+import Loading from "../../../components/Loading";
 
 type StayData = {
   email: string
@@ -48,8 +49,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 export default function Event({ event }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [stays, setStays] = useState<Stay[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true)
     const getStays = async () => {
       const querySnapshot = await getDocs(query(collection(db, "Stays")));
       const stays: Stay[] = [];
@@ -58,8 +61,8 @@ export default function Event({ event }: InferGetServerSidePropsType<typeof getS
       });
       setStays(stays);
     }
-    console.log(event)
     getStays();
+    setLoading(false);
   }, [])
 
   const renderStays = () => {
@@ -67,8 +70,8 @@ export default function Event({ event }: InferGetServerSidePropsType<typeof getS
       return(
         <div key={stay.id}>
         {stay.data.eventName === event.name &&
-        <div  className="w-96 ml-12 mr-12 rounded-xl relative">
-          <div className="w-full h-96 rounded-md shadow-[1px_1px_25px_rgba(0,0,0,0.24)] hover:scale-105 transition ease-in duration-180 cursor-pointer overflow-hidden relative">
+        <div  className="w-80 ml-12 mr-12 rounded-xl relative">
+          <div className="w-full h-80 rounded-md shadow-[1px_1px_25px_rgba(0,0,0,0.24)] hover:scale-105 transition ease-in duration-180 cursor-pointer overflow-hidden relative">
             {stay.data.image ? 
             <Link href={`/stays/${stay.id}`}><Image alt="stayImage" layout='fill' objectFit='cover'  src={stay.data.image}></Image></Link>
             :
@@ -93,13 +96,14 @@ export default function Event({ event }: InferGetServerSidePropsType<typeof getS
       )
     })
     return (
-      <div className="flex flex-wrap mt-4 justify-center py-8 pb-16 items-center z-10 bg-white">
+      <div className="flex flex-wrap mt-4 justify-center py-8 pb-0 items-center z-10 bg-white">
         {staysList}
       </div>
     )
   }
   return (
     <>
+      <Loading />
       <Navbar style="dark" showNav={true}/>
       <div className="w-full h-full pt-2 bg-[#F0EFF4] pb-20 top-0 lg:fixed">
         <div className="w-10/12 lg:w-11/12 ml-8 lg:py-4 lg:h-72 bg-gray-100 overflow-hidden flex flex-wrap border-4 border-black shadow-[12px_15px_0_rgba(0,0,0,1)] rounded-xl mt-28 ">
@@ -123,7 +127,15 @@ export default function Event({ event }: InferGetServerSidePropsType<typeof getS
         </div>
       </div>
       <div className="z-30 lg:mt-30rem absolute bg-white w-full py-8 border-4 border-gray-200 ">
-        {renderStays()}
+        {loading ? 
+        <div className="w-full flex justify-center mt-10">
+          <div className="spinner"></div>
+        </div>
+        :
+        <div>
+          {renderStays()}
+        </div>
+        }
         <Footer />
       </div>
     </>

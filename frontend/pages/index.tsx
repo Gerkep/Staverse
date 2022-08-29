@@ -13,6 +13,7 @@ import Image from "next/image";
 import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import { db } from "../firebase/clientApp";
+import Loading from "../components/Loading";
 const fileTypes = ["JPG", "PNG"];
 
 const eventsList = ["ETHBogota", "ETHSanFrancisco"];
@@ -49,15 +50,18 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
   const [spots, setSpots] = useState("");
   const [image, setImage] = useState<any>(null);
   const [dateRange, setDateRange] = useState({startDate: new Date(), endDate: new Date(), key: 'selection'})
-  const [showCallendar, setShowCallendar] = useState(false)
+  const [showCallendar, setShowCallendar] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (image: File) => {
     setImage(image);
   };
 
   const submitStay = (e: React.FormEvent<HTMLFormElement>) => {
+    setLoading(true);
     e.preventDefault();
-    setShowModal(true)
+    setShowModal(true);
+    setLoading(false);
   }
 
   const handleDateSelect = (ranges:any) => {
@@ -68,6 +72,7 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
     e.stopPropagation();
     setShowCallendar(true)
   }
+
   const renderEvents = () => {
     const eventList = events.map((event: Event) => {
       return (
@@ -95,6 +100,7 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
 
   return (
     <div onClick={() => setShowCallendar(false)}>
+      <Loading />
       <Navbar style="dark" showNav={false}/>
       <div className="lg:w-1/2 fixed mt-36 lg:mt-48">
           <h1 className="text-5xl lg:text-7xl ml-8 font-black"><span className="text-indigo-600">Book a stay</span> for <br/> your next hack.</h1>
@@ -231,7 +237,13 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
                   type="submit"
                   className="w-full flex justify-center py-4 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black"
                 >
-                  Add new
+                {loading ? 
+                <div className='spinner-white'></div>
+                :
+                <p>
+                  Add Stay
+                </p>
+                }
                 </button>
               </div>
             </form>

@@ -9,6 +9,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import {HiOutlinePhotograph} from "react-icons/hi";
 import Link from "next/link";
 import Image from "next/image";
+import Loading from "../../../components/Loading";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const stayId = context.params?.stayId
@@ -33,6 +34,7 @@ export default function Stay({ stay }: InferGetServerSidePropsType<typeof getSer
 
   return (
     <>
+      <Loading />
       <Navbar style="dark" showNav={true}/>
       <div className="w-full h-screen flex justify-center">
         <div className="w-11/12 lg:w-10/12 h-full lg:h-5/6 lg:grid lg:grid-cols-2 items-center pt-4 lg:pt-0 lg:pt-12 border-4 border-gray-200 mt-24 rounded-xl bg-gray-100 px-6 lg:px-12 justify-center">

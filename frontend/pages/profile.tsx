@@ -1,8 +1,10 @@
 import Navbar from "../components/layout/Navbar";
+import Loading from "../components/Loading";
 
 export default function Profile() {
   return (
     <>
+      <Loading />
       <Navbar style="light" showNav={false}/>
       <div className="w-full h-80 bg-dimmedBackground bg-cover bg-bottom bg-no-repeat fixed top-0 z-0">
       </div>

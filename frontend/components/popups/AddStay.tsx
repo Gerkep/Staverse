@@ -33,12 +33,14 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
   const [fullName, setFullName] = useState("");
   const [step, setStep] = useState(1);
   const [stayId, setStayId] = useState<string>("");
+  const [loading, setLoading] = useState(false);
 
     const handleCloseClick = () => {
         props.onCloseModal();
     };
 
     const addStay = async (e: React.FormEvent<HTMLFormElement>) => {
+      setLoading(true);
       e.preventDefault();
       const subdomain = 'https://staverse.infura-ipfs.io';
       const date = `${(props.dates.startDate).getDate()} ${months[(props.dates.startDate).getMonth()]}-${(props.dates.endDate).getDate()} ${months[(props.dates.endDate).getMonth()]}`
@@ -62,6 +64,7 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
         date: date
       }).then((docRef) => {
         setStayId(docRef.id);
+        setLoading(false);
         setStep(2);
       });
     }
@@ -126,7 +129,14 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
                 type="submit"
                 className="w-full flex justify-center py-4 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black"
               >
-                Add stay
+                {loading ? 
+                <div className='spinner-white'></div>
+                :
+                <p>
+                  Add Stay
+                </p>
+                }
+
               </button>
             </div>
           </form>
