@@ -18,3 +18,8 @@ a {
 * {
   box-sizing: border-box;
 }
+@media only screen and (min-width: 768px) {
+  .polygon{
+    clip-path: polygon(25% 0%, 100% 0%, 100% 100%, 0% 100%);
+  }
+} 

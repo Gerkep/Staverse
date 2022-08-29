@@ -72,7 +72,7 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
     const eventList = events.map((event: Event) => {
       return (
         <Link key={event.data.name} href={`/events/${event.id}`}>
-          <div className="w-4/12 h-64 bg-white shadow-[12px_15px_0_rgba(0,0,0,1)] border-4 ml-12 mr-12 mt-16 border-black rounded-xl hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180 cursor-pointer">
+          <div className="w-11/12 lg:w-4/12 h-64 bg-white shadow-[12px_15px_0_rgba(0,0,0,1)] border-4 lg:ml-12 lg:mr-12 mt-16 border-black rounded-xl hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180 cursor-pointer">
               <div className={`w-full h-40 rounded-xl overflow-hidden relative`}>
                 <Image alt="stayImage" layout='fill' objectFit='cover'  src={event.data.imageURL}></Image>
               </div>
@@ -87,7 +87,7 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
       )
     })
     return (
-      <div className="w-full justify-center flex">
+      <div className="w-full justify-center flex flex-wrap">
         {eventList}
       </div>
     )
@@ -95,19 +95,19 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
 
   return (
     <div onClick={() => setShowCallendar(false)}>
-      <Navbar style="dark"/>
-      <div style={{marginTop: "25vh"}} className="w-1/2 fixed ">
-          <h1 className="text-7xl ml-8 font-black"><span className="text-indigo-600">Book a stay</span> for <br/> your next hack.</h1>
-          <p className="w-4/6 ml-8 mt-10 text-2xl font-black ">
+      <Navbar style="dark" showNav={false}/>
+      <div className="lg:w-1/2 fixed mt-36 lg:mt-48">
+          <h1 className="text-5xl lg:text-7xl ml-8 font-black"><span className="text-indigo-600">Book a stay</span> for <br/> your next hack.</h1>
+          <p className="w-5/6 lg:w-4/6 ml-8 mt-10 text-xl lg:text-2xl lg:font-black ">
           Because all hackers deserve a great place to stay during hackathon!</p>
           <a href="#upcoming"><button className="border-4 border-black text-black shadow-[12px_12px_0_rgba(0,0,0,1)] font-black rounded-xl 
-          px-24 py-6 text-black text-xl ml-8 mt-20 hover:scale-105 transition ease-in duration-240 hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180">
+          px-20 lg:px-24 py-6 text-black text-xl ml-8 mt-20 hover:scale-105 transition ease-in duration-240 hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180">
             Upcoming Events
           </button></a>
         </div>
       {showModal ? <AddStay onCloseModal={() => setShowModal(false)} link={link} price={price} dates={dateRange} eventName={eventName} spots={spots} image={image}/> : '' }
-      <div style={{clipPath: "polygon(25% 0%, 100% 0%, 100% 100%, 0% 100%)"}} className="h-screen w-8/12 bg-stay2 bg-cover bg-right z-0 shadow-[0px_20px_0_rgba(0,0,0,1)] fixed right-0 top-0 flex items-center">
-      <div className="mt-8 absolute right-20  shadow-[20px_20px_0_rgba(0,0,0,1)] border-4 border-black rounded-2xl overflow-hidden">
+      <div className="polygon h-screen w-8/12 hidden lg:block bg-stay2 bg-cover bg-right z-0 shadow-[0px_20px_0_rgba(0,0,0,1)] fixed right-0 top-0 flex items-center">
+      <div className="mt-20 absolute right-20 shadow-[20px_20px_0_rgba(0,0,0,1)] border-4 border-black rounded-2xl overflow-hidden">
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 ">
             <h2 className="text-center text-3xl font-bold">Add <span className="text-indigo-600">new stay</span></h2>
             <form className="space-y-6 py-6" onSubmit={(e) => submitStay(e)}>
@@ -238,11 +238,11 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
           </div>
           </div>
       </div>
-      <div style={{marginTop: "100vh"}} className="z-20 bg-white w-full absolute border-t-8 border-black ">
+      <div style={{marginTop: "100vh"}} className="z-40 bg-white w-full absolute border-t-8 border-black ">
       <div className="pt-12 sm:pt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl tracking-tight font-bold text-gray-900 sm:text-5xl sm:tracking-tight">
+          <h2 className="text-4xl lg:text-5xl tracking-tight font-black lg:font-bold text-gray-900 sm:tracking-tight">
             Trusted by devs from 5 continents
           </h2>
           <p className="mt-3 text-xl text-gray-500 sm:mt-4">
@@ -254,8 +254,8 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
         <div className="relative">
           <div className="absolute inset-0 h-1/2" />
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
-              <dl className="rounded-lg bg-white shadow-[12px_15px_0_rgba(0,0,0,1)] hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180 border-4 border-black sm:grid sm:grid-cols-3">
+            <div className="max-w-4xl mx-auto flex justify-center w-full">
+              <dl className="w-10/12 rounded-lg bg-white shadow-[12px_15px_0_rgba(0,0,0,1)] hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180 border-4 border-black sm:grid sm:grid-cols-3">
                 <div className="flex flex-col border-b border-gray-100 p-6 text-center sm:border-0 sm:border-r">
                   <dt className="order-2 mt-2 text-lg leading-6 font-medium text-gray-500">Refund Guarantee</dt>
                   <dd className="order-1 text-5xl tracking-tight font-bold text-indigo-600 ">100%</dd>
@@ -274,10 +274,10 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
         </div>
       </div>
     </div>
-    <div style={{backgroundColor: "#F0EEFA"}} className="py-24">
+    <div style={{backgroundColor: "#F0EFF4"}} className="py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl tracking-tight font-bold text-gray-900 sm:text-5xl sm:tracking-tight">
+          <h2 className="text-4xl lg:text-5xl tracking-tight font-black lg:font-bold text-gray-900 sm:tracking-tight">
            How can I do it?
           </h2>
           <p className="mt-3 text-xl text-gray-500 sm:mt-4">
@@ -285,24 +285,24 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
           </p>
         </div>
       </div>
-      <div className="flex mt-8 justify-center py-12 items-center">
+      <div className="flex flex-wrap lg:mt-8 justify-center py-12 items-center">
         <div className="w-72 h-96 bg-white shadow-[12px_15px_0_rgba(0,0,0,1)] border-4 border-black rounded-xl flex flex-wrap justify-center ml-10 mr-10 hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180">
           <div className="w-full h-40 bg-backblur bg-center bg-cover rounded-md"></div>
           <div className="w-20 h-20 bg-createIcon bg-center bg-contain bg-no-repeat absolute mt-8"></div>
           <h3 className="text-center font-black text-3xl ">Add stay</h3>
           <p className="text-center font-medium text-l w-5/6">Find a stay on service like Airbnb, copy the link and add new offer to our platform.</p>
         </div>
-        <div className="w-20 h-10 bg-arrow bg-center bg-contain bg-no-repeat ml-6">
+        <div className="w-20 h-10 hidden lg:block bg-arrow bg-center bg-contain bg-no-repeat ml-6">
         </div>
-        <div className="w-72 h-96 bg-white shadow-[12px_15px_0_rgba(0,0,0,1)] border-4 border-black rounded-xl flex flex-wrap justify-center ml-10 mr-10 hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180 ">
+        <div className="w-72 h-96 mt-20 lg:mt-8 bg-white shadow-[12px_15px_0_rgba(0,0,0,1)] border-4 border-black rounded-xl flex flex-wrap justify-center ml-10 mr-10 hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180 ">
           <div className="w-full h-40 bg-backblur bg-center bg-cover rounded-md"></div>
           <div className="w-20 h-20 bg-sendIcon bg-center bg-contain bg-no-repeat absolute mt-8"></div>
           <h3 className="text-center font-black text-3xl">Fund it</h3>
           <p className="text-center font-medium text-l w-5/6">You can book alone or with frens. All funds will be safely stored on a smart contract.</p>
         </div>
-        <div className="w-20 h-10 bg-arrow bg-center bg-contain bg-no-repeat ml-6">
+        <div className="w-20 h-10 hidden lg:block bg-arrow bg-center bg-contain bg-no-repeat ml-6">
         </div>
-        <div className="w-72 h-96 bg-white shadow-[12px_15px_0_rgba(0,0,0,1)] border-4 border-black rounded-xl flex flex-wrap justify-center ml-10 mr-10 hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180" >
+        <div className="w-72 h-96 mt-20 lg:mt-8 bg-white shadow-[12px_15px_0_rgba(0,0,0,1)] border-4 border-black rounded-xl flex flex-wrap justify-center ml-10 mr-10 hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180" >
           <div className="w-full h-40 bg-backblur bg-center bg-cover rounded-md"></div>
           <div className="w-20 h-20 bg-checkIcon bg-center bg-contain bg-no-repeat absolute mt-8"></div>
           <h3 className="text-center font-black text-3xl">Book it</h3>
@@ -314,7 +314,7 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
     <div className="pt-24 pb-12" id="upcoming">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl tracking-tight font-bold text-gray-900 sm:text-5xl sm:tracking-tight">
+          <h2 className="text-4xl lg:text-5xl tracking-tight font-black lg:font-bold text-gray-900 sm:tracking-tight">
            Upcoming web3 events
           </h2>
           <p className="mt-4 font-bold text-indigo-500 text-lg">YOU DO NOT WANT TO MISS</p>
