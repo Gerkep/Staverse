@@ -8,7 +8,7 @@ export default function MobileMenu(props: {onCloseModal: any}){
 
     const addForm = () => {
         return (
-          <div onClick={(e) => e.stopPropagation()} className="mx-auto rounded-lg w-3/4 h-1/2 border-4 border-gray-200 cursor-auto shadow-[2px_2px_10px_rgba(0,0,0,0.15)]">
+          <div onClick={(e) => e.stopPropagation()} className="mx-auto rounded-lg w-3/4 h-1/2 border-4 border-black cursor-auto shadow-[12px_12px_0px_rgba(0,0,0,1)]">
           <div className="bg-white w-full h-full py-8 px-4 shadow rounded-md sm:px-10 " >
           <Link href="/"><p className='w-full text-center mt-12 text-2xl font-black cursor-pointer'>Home</p></Link>
               <Link href="/profile"><p className='w-full text-center mt-6 text-2xl font-black cursor-pointer'>Profile</p></Link>
