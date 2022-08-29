@@ -21,11 +21,18 @@ const client = create({
   },
 });
  
-export default function Signin(props: {onCloseModal: any, link: string, price: string, eventName: string, spots: string, image: string}){
+type DateRange = {
+  startDate: Date, 
+  endDate: Date, 
+  key: string
+}
+const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Dec"]
+export default function Signin(props: {onCloseModal: any, link: string, price: string, dates: DateRange, eventName: string, spots: string, image: string}){
 
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [step, setStep] = useState(1);
+  const [stayId, setStayId] = useState<string>("");
 
     const handleCloseClick = () => {
         props.onCloseModal();
@@ -34,6 +41,7 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
     const addStay = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       const subdomain = 'https://staverse.infura-ipfs.io';
+      const date = `${(props.dates.startDate).getDate()} ${months[(props.dates.startDate).getMonth()]}-${(props.dates.endDate).getDate()} ${months[(props.dates.endDate).getMonth()]}`
       let URL = "";
       if(props.image){
         try {
@@ -50,13 +58,17 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
         spots: props.spots,
         fullName: fullName,
         email: email,
-        image: URL
-      }).then(() => setStep(2));
+        image: URL,
+        date: date
+      }).then((docRef) => {
+        setStayId(docRef.id);
+        setStep(2);
+      });
     }
 
     const stepOne = () => {
       return (
-        <div className="sm:mx-auto sm:w-full sm:max-w-md rounded-xl border-4 border-black shadow-[20px_20px_0_rgba(0,0,0,1)]">
+        <div className="sm:mx-auto sm:w-full sm:max-w-md rounded-xl border-4 border-black shadow-[20px_20px_0_rgba(0,0,0,1)] cursor-auto">
         <div className="bg-white py-8 pb-16 px-4  shadow sm:rounded-lg sm:px-10 cursor-auto v" onClick={(e) => e.stopPropagation()}>
           <h1 className=' text-center font-bold text-3xl'>Who is booking?</h1>
           <div className='flex pb-8 w-full justify-center'>
@@ -125,7 +137,7 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
 
     const stepTwo = () => {
       return (
-        <div className="sm:mx-auto sm:w-full sm:max-w-md sm:rounded-lg border-4 rounded-xl border-black shadow-[20px_20px_0_rgba(0,0,0,1)]">
+        <div className="sm:mx-auto sm:w-full sm:max-w-md sm:rounded-lg border-4 rounded-xl border-black shadow-[20px_20px_0_rgba(0,0,0,1)] cursor-auto">
         <div className="bg-white py-8 pb-16 px-4 shadow sm:rounded-lg sm:px-10 cursor-auto" onClick={(e) =>  e.stopPropagation()}>
           <div className='w-full flex justify-center'>
             <HiOutlineCheckCircle className='w-36 h-36 text-light-green' />
@@ -134,7 +146,7 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
           <div className='flex pb-8 w-full justify-center'>
                   <p className='text-center mt-4 text-gray-500'>Your stay offer was successfully added to our platform! You can now share it with your frens!</p>
           </div>
-          <Link href="/stays/1">
+          <Link href={`/stays/${stayId}`}>
             <button
               className="w-full flex justify-center py-4 px-4 border mt-8 border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black"
             >

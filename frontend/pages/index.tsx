@@ -1,22 +1,57 @@
 import Navbar from "../components/layout/Navbar";
 import Link from "next/link"
 import AddStay from "../components/popups/AddStay";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Footer from "../components/layout/Footer";
 import { FileUploader } from "react-drag-drop-files";
 import { HiOutlinePhotograph } from "react-icons/hi";
+import Dropdown from "../components/layout/Dropdown";
+import 'react-date-range/dist/styles.css'; 
+import 'react-date-range/dist/theme/default.css';
+import { DateRange } from 'react-date-range';
+import Image from "next/image";
+import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
+import { db } from "../firebase/clientApp";
 const fileTypes = ["JPG", "PNG"];
 
-export default function Home() {
+const eventsList = ["ETHBogota", "ETHSanFrancisco"];
+
+type EventDetails = {
+  organizer: string,
+  name: string,
+  dateRange: string, 
+  imageURL: string
+}
+type Event = {
+  id: string,
+  data: EventDetails
+}
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  let events: object[] = []
+  const querySnapshot = await getDocs(query(collection(db, "Events")));
+  querySnapshot.forEach((doc) => {
+    events.push({id: doc.id, data: doc.data()})
+  });
+  return {
+    props: {
+      events
+    }
+  }
+}
+
+export default function Home({ events }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [showModal, setShowModal] = useState(false);
   const [link, setLink] = useState("");
   const [price, setPrice] = useState("");
-  const [dates, setDates] = useState("");
   const [eventName, setEventName] = useState("");
   const [spots, setSpots] = useState("");
   const [image, setImage] = useState<any>(null);
+  const [dateRange, setDateRange] = useState({startDate: new Date(), endDate: new Date(), key: 'selection'})
+  const [showCallendar, setShowCallendar] = useState(false)
 
-  const handleChange = (image: any) => {
+  const handleChange = (image: File) => {
     setImage(image);
   };
 
@@ -25,8 +60,41 @@ export default function Home() {
     setShowModal(true)
   }
 
+  const handleDateSelect = (ranges:any) => {
+    console.log(ranges);
+    setDateRange({startDate: ranges.selection.startDate, endDate: ranges.selection.endDate, key: 'selection'})
+  }
+  const displayCallendar = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    setShowCallendar(true)
+  }
+  const renderEvents = () => {
+    const eventList = events.map((event: Event) => {
+      return (
+        <Link key={event.data.name} href={`/events/${event.id}`}>
+          <div className="w-4/12 h-64 bg-white shadow-[12px_15px_0_rgba(0,0,0,1)] border-4 ml-12 mr-12 mt-16 border-black rounded-xl hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180 cursor-pointer">
+              <div className={`w-full h-40 rounded-xl overflow-hidden relative`}>
+                <Image alt="stayImage" layout='fill' objectFit='cover'  src={event.data.imageURL}></Image>
+              </div>
+              <div className="w-full grid grid-cols-2 grid-rows-2 items-center">
+                <h3 className="text-2xl ml-2 mt-2 font-bold text-gray-900">{event.data.name}</h3>
+                <p className="text-right mt-2 text-lg leading-6 font-medium text-gray-500 mr-2 mt-2">{event.data.dateRange}</p>
+                <p className="ml-2 text-lg leading-6 font-medium text-gray-500">{event.data.organizer}</p>
+                <p> </p>
+              </div>
+          </div>
+          </Link>
+      )
+    })
+    return (
+      <div className="w-full justify-center flex">
+        {eventList}
+      </div>
+    )
+  }
+
   return (
-    <>
+    <div onClick={() => setShowCallendar(false)}>
       <Navbar style="dark"/>
       <div style={{marginTop: "25vh"}} className="w-1/2 fixed ">
           <h1 className="text-7xl ml-8 font-black"><span className="text-indigo-600">Book a stay</span> for <br/> your next hack.</h1>
@@ -37,9 +105,9 @@ export default function Home() {
             Upcoming Events
           </button></a>
         </div>
-      {showModal ? <AddStay onCloseModal={() => setShowModal(false)} link={link} price={price} eventName={eventName} spots={spots} image={image}/> : '' }
+      {showModal ? <AddStay onCloseModal={() => setShowModal(false)} link={link} price={price} dates={dateRange} eventName={eventName} spots={spots} image={image}/> : '' }
       <div style={{clipPath: "polygon(25% 0%, 100% 0%, 100% 100%, 0% 100%)"}} className="h-screen w-8/12 bg-stay2 bg-cover bg-right z-0 shadow-[0px_20px_0_rgba(0,0,0,1)] fixed right-0 top-0 flex items-center">
-      <div className="mt-8 absolute right-20  shadow-[20px_20px_0_rgba(0,0,0,1)] border-4 border-black rounded-2xl">
+      <div className="mt-8 absolute right-20  shadow-[20px_20px_0_rgba(0,0,0,1)] border-4 border-black rounded-2xl overflow-hidden">
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 ">
             <h2 className="text-center text-3xl font-bold">Add <span className="text-indigo-600">new stay</span></h2>
             <form className="space-y-6 py-6" onSubmit={(e) => submitStay(e)}>
@@ -54,6 +122,7 @@ export default function Home() {
                     onChange={(e) => setLink(e.target.value)}
                     value={link}
                     type="text"
+                    placeholder='https://...'
                     autoComplete="link"
                     required
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
@@ -61,6 +130,37 @@ export default function Home() {
                 </div>
               </div>
               <div className="grid w-full grid-cols-2">
+              <div>
+                  <label htmlFor="dates" className="block text-sm font-medium text-gray-700">
+                    Dates
+                  </label>
+                  <div className="mt-1" onClick={(e) => displayCallendar(e)}>
+                    <div  className="appearance-none cursor-pointer block w-5/6 px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                      {(dateRange.startDate).getDate() !== (dateRange.endDate).getDate() ?
+                      <div>
+                        {(dateRange.startDate).getDate()}/{(dateRange.startDate).getMonth() + 1}-
+                        {(dateRange.endDate).getDate()}/{(dateRange.endDate).getMonth() + 1}
+                      </div>
+                      :
+                      <div className="text-gray-400">
+                        Choose
+                      </div>
+                      }
+                    </div>
+                    <div className="absolute z-50 w-5/6">
+                      {showCallendar &&
+                        <DateRange
+                        rangeColors={["#4f45e4"]}
+                        minDate={new Date}
+                        ranges={[dateRange]}
+                        onChange={handleDateSelect}
+                        showMonthAndYearPickers={false}
+                        showDateDisplay={false}
+                        />                      
+                      }
+                    </div>
+                  </div>
+                </div>
                 <div>
                   <label htmlFor="price" className="block text-sm font-medium text-gray-700">
                     Total price $
@@ -74,21 +174,6 @@ export default function Home() {
                       type="number"
                       autoComplete="price"
                       required
-                      className="appearance-none block w-5/6 px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label htmlFor="dates" className="block text-sm font-medium text-gray-700">
-                    Dates
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      id="dates"
-                      name="dates"
-                      type="number"
-                      autoComplete="dates"
-                      required
                       className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                   </div>
@@ -99,17 +184,8 @@ export default function Home() {
                   <label htmlFor="event" className="block text-sm font-medium text-gray-700">
                     Event
                   </label>
-                  <div className="mt-1">
-                    <input
-                      id="event"
-                      name="event"
-                      onChange={(e) => setEventName(e.target.value)}
-                      value={eventName}
-                      type="text"
-                      autoComplete="event"
-                      required
-                      className="appearance-none block w-5/6 px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    />
+                  <div className="mt-1 w-5/6">
+                    <Dropdown values={eventsList} onChange={setEventName}/>
                   </div>
                 </div>
                 <div>
@@ -122,6 +198,7 @@ export default function Home() {
                       name="spots"
                       onChange={(e) => setSpots(e.target.value)}
                       value={spots}
+                      min={1}
                       type="number"
                       autoComplete="spots"
                       required
@@ -136,11 +213,11 @@ export default function Home() {
               </label>
               <FileUploader handleChange={handleChange} name="file" types={fileTypes} multiple={false} label="Drop an image" >
                 {image ? 
-                <div className=" w-full border-4 border-gray-200 rounded-xl mt-2 pt-4 pb-6 cursor-pointer">
+                <div className=" w-full border-4 border-gray-200 border-dashed rounded-xl mt-2 pt-4 pb-6 cursor-pointer">
                   <div className="w-full text-center text-gray-500">{image.name} <br />Uploaded sccessfully ✅</div>
                 </div>   
                 :
-                <div className=" w-full border-4 border-gray-200 rounded-xl mt-2 pt-4 pb-6 cursor-pointer">
+                <div className=" w-full border-4 border-gray-200 border-dashed rounded-xl mt-2 pt-4 pb-6 cursor-pointer">
                   <div className="w-full flex justify-center">
                     <HiOutlinePhotograph className="w-10 h-10 text-gray-300"/>
                   </div>
@@ -243,33 +320,10 @@ export default function Home() {
           <p className="mt-4 font-bold text-indigo-500 text-lg">YOU DO NOT WANT TO MISS</p>
         </div>
       </div>
-      <div className="w-full justify-center flex">
-        <Link href="/events/1">
-        <div className="w-4/12 h-64 bg-white shadow-[12px_15px_0_rgba(0,0,0,1)] border-4 ml-12 mr-12 mt-16 border-black rounded-xl hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180 cursor-pointer">
-            <div className="w-full h-40 bg-ETHBogota bg-center bg-cover rounded-md"></div>
-            <div className="w-full grid grid-cols-2 grid-rows-2 items-center">
-              <h3 className="text-2xl ml-2 mt-2 font-bold text-gray-900">ETHBogota</h3>
-              <p className="text-right mt-2 text-lg leading-6 font-medium text-gray-500 mr-2 mt-2">7-9 Oct</p>
-              <p className="ml-2 text-lg leading-6 font-medium text-gray-500">ETHGlobal</p>
-              <p> </p>
-            </div>
-          </div>
-          </Link>
-          <Link href="/events/1">
-          <div className="w-4/12 h-64 bg-white shadow-[12px_15px_0_rgba(0,0,0,1)] border-4 ml-12 mr-12 mt-16 border-black rounded-xl hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180 cursor-pointer">
-            <div className="w-full h-40 bg-ETHSanFrancisco bg-center bg-cover rounded-md"></div>
-            <div className="w-full grid grid-cols-2 grid-rows-2 items-center">
-              <h3 className="text-2xl ml-2 mt-2 font-bold text-gray-900">ETHSanFrancisco</h3>
-              <p className="text-right mt-2 text-lg leading-6 font-medium text-gray-500 mr-2 mt-2">4-6 Nov</p>
-              <p className="ml-2 text-lg leading-6 font-medium text-gray-500">ETHGlobal</p>
-              <p> </p>
-            </div>
-          </div>
-          </Link>
-        </div>
+        {renderEvents()}
       </div>
       <Footer />
       </div>
-    </>
+    </div>
   )
 }
