@@ -83,7 +83,7 @@ export default function Stay({ stay }: InferGetServerSidePropsType<typeof getSer
                   </div>
                 </div>
                 <div className="w-full grid grid-cols-2 mt-6 lg:mt-20">
-                  <h2 className="text-xl ml-5 ">You pay: </h2>
+                  <h2 className="text-xl ml-5 ">You Pay: </h2>
                   <div className="w-full flex justify-end">
                     <p className="font-black mr-5 text-2xl lg:text-4xl">${(parseInt(stay.price)/parseInt(stay.spots)).toFixed(2)}</p>
                   </div>
