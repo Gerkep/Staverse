@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CloseIcon } from '@chakra-ui/icons';
 import internal from 'stream';
 import { BigNumber } from 'ethers';
@@ -7,6 +7,8 @@ import { db } from "../../firebase/clientApp";
 import Link from 'next/link';
 import { HiOutlinePhotograph, HiOutlineCheckCircle } from 'react-icons/hi';
 import { create, CID, IPFSHTTPClient } from "ipfs-http-client";
+import { useAccount, useNetwork, useSendTransaction } from 'wagmi';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 const fileTypes = ["JPG", "PNG"];
 const projectId = process.env.NEXT_PUBLIC_IPFS_PROJECT_ID;
@@ -27,6 +29,7 @@ type DateRange = {
   key: string
 }
 const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Dec"]
+
 export default function Signin(props: {onCloseModal: any, link: string, price: string, dates: DateRange, eventName: string, spots: string, image: string}){
 
   const [email, setEmail] = useState("");
@@ -34,6 +37,12 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
   const [step, setStep] = useState(1);
   const [stayId, setStayId] = useState<string>("");
   const [loading, setLoading] = useState(false);
+
+  const { address, isConnected: isWagmiConnected } = useAccount();
+
+  useEffect(() => {
+    console.log(address);
+  })
 
     const handleCloseClick = () => {
         props.onCloseModal();
@@ -125,6 +134,7 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
                 </label>
             </div>
             <div>
+              {address ?
               <button
                 type="submit"
                 className="w-full flex justify-center py-4 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black"
@@ -136,8 +146,12 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
                   Add Stay
                 </p>
                 }
-
-              </button>
+              </button>           
+              :
+              <div className='w-full flex justify-center mt-12'>
+                  <ConnectButton />   
+              </div>
+              }
             </div>
           </form>
         </div>

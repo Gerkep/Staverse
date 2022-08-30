@@ -11,13 +11,12 @@ const { chains, provider, webSocketProvider } = configureChains(
   chain.goerli
   ],
   [
-
     publicProvider(),
   ]
 );
 
 const { connectors } = getDefaultWallets({
-  appName: 'RainbowKit App',
+  appName: 'Staverse',
   chains,
 });
 
