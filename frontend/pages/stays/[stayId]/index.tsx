@@ -37,7 +37,7 @@ export default function Stay({ stay }: InferGetServerSidePropsType<typeof getSer
       <Loading />
       <Navbar style="dark" showNav={true}/>
       <div className="w-full h-screen flex justify-center">
-        <div className="w-11/12 lg:w-10/12 h-full lg:h-5/6 lg:grid lg:grid-cols-2 items-center pt-4 lg:pt-0 lg:pt-12 border-4 border-gray-200 mt-24 rounded-xl bg-gray-100 px-6 lg:px-12 justify-center">
+        <div className="w-11/12 lg:w-10/12 h-full lg:h-5/6 lg:grid lg:grid-cols-2 items-center pt-4 lg:pt-0 lg:pt-0 border-4 border-gray-200 mt-24 rounded-xl bg-gray-100 px-6 lg:px-12 justify-center">
             <a href={`${stay.link}`} className="w-full h-48 lg:h-5/6 hover:scale-105 hover:shadow-[5px_8px_30px_rgba(0,0,0,0.24)] rounded-xl transition ease-in duration-240">
                 <div className="w-full h-48 lg:h-full rounded-xl cursor-pointer overflow-hidden relative">
                 {stay.image ? 
