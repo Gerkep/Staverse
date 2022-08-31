@@ -1,4 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import Booker from '../../artifacts/contracts/Booker.sol/Booker.json';
+import { Booker as BookerType } from '../../typechain-types';
+import { ethers } from 'ethers'
+import { useContract } from 'wagmi'
 import { CloseIcon } from '@chakra-ui/icons';
 import internal from 'stream';
 import { BigNumber } from 'ethers';
@@ -39,7 +43,11 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
   const [loading, setLoading] = useState(false);
 
   const { address, isConnected: isWagmiConnected } = useAccount();
-
+  const contract = useContract({
+    addressOrName: '0xAceA24d62e9d12572Cdc69cB482093AFD5d8D2f9',
+    contractInterface: Booker.abi,
+  })
+  
   useEffect(() => {
     console.log(address);
   })
