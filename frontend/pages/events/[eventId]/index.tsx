@@ -2,6 +2,9 @@ import { IoLogoTwitter, IoLogoDiscord, IoDesktop } from "react-icons/io5";
 import { useEffect, useState } from "react";
 import Navbar from "../../../components/layout/Navbar";
 import Create from "../../../components/popups/Create";
+import Booker from '../../../artifacts/contracts/Booker.sol/Booker.json';
+import { Booker as BookerType } from '../../../typechain-types';
+import { ethers } from 'ethers'
 import Link from "next/link";
 import Image from "next/image";
 import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
@@ -52,8 +55,10 @@ export default function Event({ event }: InferGetServerSidePropsType<typeof getS
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true)
+    setLoading(true);
     const getStays = async () => {
+      const provider = ethers.getDefaultProvider('goerli')
+      const contract = new ethers.Contract('0xc44a1A274F81dA3651568aD43C19109f834B88Ea', Booker.abi, provider) as BookerType;
       const querySnapshot = await getDocs(query(collection(db, "Stays")));
       const stays: Stay[] = [];
       querySnapshot.forEach((doc) => {
@@ -61,6 +66,7 @@ export default function Event({ event }: InferGetServerSidePropsType<typeof getS
       });
       setStays(stays);
     }
+
     getStays();
     setLoading(false);
   }, [])
@@ -82,11 +88,11 @@ export default function Event({ event }: InferGetServerSidePropsType<typeof getS
           <p className="text-left  text-xl">${(parseInt(stay.data.price)/parseInt(stay.data.spots)).toFixed(2)}</p>
 
           <div className="flex justify-end ml-2">
-          {Array(parseInt(stay.data.spots))
+          {/* {Array(stay.data.spots)
             .fill('')
             .map((x, idx) => (
               <div key={idx} className="h-6 w-6 bg-light-green rounded-full ml-1 mr-1"></div>
-            ))}
+            ))} */}
           </div>
           <p className="text-left text-gray-500 text-md mr-2">{stay.data.date}</p>
           </div>

@@ -2,10 +2,8 @@ import React, { useEffect, useState } from 'react';
 import Booker from '../../artifacts/contracts/Booker.sol/Booker.json';
 import { Booker as BookerType } from '../../typechain-types';
 import { ethers } from 'ethers'
-import { useContract } from 'wagmi'
+import { useSigner } from 'wagmi'
 import { CloseIcon } from '@chakra-ui/icons';
-import internal from 'stream';
-import { BigNumber } from 'ethers';
 import { doc, collection, addDoc} from "firebase/firestore"; 
 import { db } from "../../firebase/clientApp";
 import Link from 'next/link';
@@ -43,14 +41,7 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
   const [loading, setLoading] = useState(false);
 
   const { address, isConnected: isWagmiConnected } = useAccount();
-  const contract = useContract({
-    addressOrName: '0xAceA24d62e9d12572Cdc69cB482093AFD5d8D2f9',
-    contractInterface: Booker.abi,
-  })
-  
-  useEffect(() => {
-    console.log(address);
-  })
+  const { data: signer } = useSigner();
 
     const handleCloseClick = () => {
         props.onCloseModal();
@@ -59,6 +50,8 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
     const addStay = async (e: React.FormEvent<HTMLFormElement>) => {
       setLoading(true);
       e.preventDefault();
+      if(!signer) return;
+      const contract = new ethers.Contract('0xc44a1A274F81dA3651568aD43C19109f834B88Ea', Booker.abi, signer) as BookerType;
       const subdomain = 'https://staverse.infura-ipfs.io';
       const date = `${(props.dates.startDate).getDate()} ${months[(props.dates.startDate).getMonth()]}-${(props.dates.endDate).getDate()} ${months[(props.dates.endDate).getMonth()]}`
       let URL = "";
@@ -81,8 +74,13 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
         date: date
       }).then((docRef) => {
         setStayId(docRef.id);
+        const costPerPerson = parseInt(props.price)/parseInt(props.spots)*1000000;
+        try{
+          contract.addStay(docRef.id, costPerPerson, props.spots,URL).then(() => setStep(2))
+        }catch{
+          console.log("Smart contract tx error");
+        }
         setLoading(false);
-        setStep(2);
       });
     }
 

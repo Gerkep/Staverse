@@ -1,9 +1,13 @@
 import Navbar from "../../../components/layout/Navbar";
 import {  ExternalLinkIcon } from '@chakra-ui/icons'
 import Footer from "../../../components/layout/Footer";
-import { useRouter } from 'next/router'
 import { useEffect, useState } from "react";
-import { doc, getDoc } from "firebase/firestore";
+import { useSigner } from 'wagmi'
+import { ethers } from 'ethers'
+import Booker from '../../../artifacts/contracts/Booker.sol/Booker.json';
+import USDCContract from '../../../artifacts/contracts/USDCGoerli/USDCGoerli.json';
+import { Booker as BookerType } from '../../../typechain-types';
+import { doc, getDoc, deleteDoc } from "firebase/firestore";
 import { db } from "../../../firebase/clientApp";
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import {HiOutlinePhotograph} from "react-icons/hi";
@@ -25,13 +29,56 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
   return {
     props: {
-      stay
+      stay,
+      stayId,
     }
   }
 }
 
-export default function Stay({ stay }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Stay({ stay, stayId }: InferGetServerSidePropsType<typeof getServerSideProps>) {
 
+  const [loading, setLoading] = useState(false);
+  const { data: signer } = useSigner();
+  const [approved, setApproved] = useState(false);
+  const [spots, setSpots] = useState(0);
+
+  useEffect(() => {
+    const getSpots = async () => {
+      const provider = ethers.getDefaultProvider('goerli')
+      const contract = new ethers.Contract('0xc44a1A274F81dA3651568aD43C19109f834B88Ea', Booker.abi, provider) as BookerType;
+      const stayStruct = await contract.getStay(stayId);
+      setSpots(stayStruct[3]);
+    }
+    getSpots();
+  })
+const approveERC20 = async () => {
+  setLoading(true);
+  if(!signer) return;
+  const costPerPerson = parseInt(stay.price)/parseInt(stay.spots);
+  const contract = new ethers.Contract('0x88e8676363E1d4635a816d294634905AF292135A', USDCContract.abi, signer);
+  try {
+    await contract.approve('0xc44a1A274F81dA3651568aD43C19109f834B88Ea', costPerPerson*1040000).then(() => setApproved(true));
+  }catch{
+    console.log("Approval error");
+  }
+}
+const joinStay = async () => {
+  setLoading(true);
+  if(!signer) return;
+  const contract = new ethers.Contract('0xc44a1A274F81dA3651568aD43C19109f834B88Ea', Booker.abi, signer) as BookerType;
+  try{
+    const costPerPerson = parseInt(stay.price)/parseInt(stay.spots);
+    const joinTx = await contract.joinStay('0x88e8676363E1d4635a816d294634905AF292135A', costPerPerson*1040000, stayId);
+    await joinTx.wait();
+    const stayStruct = await contract.getStay(stayId);
+    if(stayStruct[3] === 0){
+      await deleteDoc(doc(db, "Stays", stayId));
+    }
+    setLoading(false);
+  }catch{
+    console.log("Smart contract tx error");
+  }
+}
   return (
     <>
       <Loading />
@@ -69,7 +116,7 @@ export default function Stay({ stay }: InferGetServerSidePropsType<typeof getSer
                       <div className="pt-2 border-r-4">
                           <label className="text-sm lg:text-md font-black ml-4 mt-4 w-full">FREE SPOTS</label>
                           <div className="flex flex-wrap mt-1 ml-3">
-                          {Array(parseInt(stay.spots))
+                          {Array(spots)
                             .fill('')
                             .map((x, idx) => (
                               <div key={idx} className="h-4 w-4 lg:h-6 lg:w-6 bg-light-green rounded-full ml-1 mr-1"></div>
@@ -89,9 +136,15 @@ export default function Stay({ stay }: InferGetServerSidePropsType<typeof getSer
                   </div>
                 </div>
                 <div className="flex justify-center w-full mt-2">
-                  <button className="w-11/12 bg-indigo-600 py-4 rounded-xl font-bold text-white cursor-pointer">
+                  {approved ? 
+                  <button onClick={() => joinStay()} className="w-11/12 bg-indigo-600 py-4 rounded-xl font-bold text-white cursor-pointer">
                       JOIN
-                  </button>
+                  </button> 
+                  :
+                  <button onClick={() => approveERC20()} className="w-11/12 bg-indigo-600 py-4 rounded-xl font-bold text-white cursor-pointer">
+                      APPROVE
+                  </button>               
+                  }
                 </div>
             </div>
         </div>
