@@ -72,11 +72,13 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
         email: email,
         image: URL,
         date: date
-      }).then((docRef) => {
+      }).then(async (docRef) => {
         setStayId(docRef.id);
         const costPerPerson = parseInt(props.price)/parseInt(props.spots)*1000000;
         try{
-          contract.addStay(docRef.id, costPerPerson, props.spots,URL).then(() => setStep(2))
+          const addTx = await contract.addStay(docRef.id, costPerPerson, props.spots,URL);
+          await addTx.wait();
+          setStep(2);
         }catch{
           console.log("Smart contract tx error");
         }

@@ -104,7 +104,7 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
       <Navbar style="dark" showNav={false}/>
       <div className="lg:w-1/2 fixed mt-36 lg:mt-48">
           <h1 className="text-5xl lg:text-7xl text-center lg:text-left lg:ml-8 font-black"><span className="text-indigo-600">Book a stay</span> for <br/> your next hack.</h1>
-          <p className="w-full px-2 lg:px-0 lg:pr-8 lg:w-4/6  lg:ml-8 mt-10 text-xl text-center lg:text-left lg:text-2xl lg:font-black text-gray-500 lg:text-black">
+          <p className="w-full px-2 lg:px-0 lg:pr-8 lg:w-4/6 lg:ml-8 mt-10 text-xl text-center lg:text-left lg:text-2xl lg:font-bold text-gray-500 lg:text-black">
           Because all hackers deserve a great place to stay during hackathon!</p>
           <div className="w-full lg:w-auto flex lg:block justify-center">
           <a href="#upcoming "><button className="border-4 border-black text-black shadow-[12px_12px_0_rgba(0,0,0,1)] font-black rounded-xl 

@@ -57,9 +57,13 @@ const approveERC20 = async () => {
   const costPerPerson = parseInt(stay.price)/parseInt(stay.spots);
   const contract = new ethers.Contract('0x88e8676363E1d4635a816d294634905AF292135A', USDCContract.abi, signer);
   try {
-    await contract.approve('0xc44a1A274F81dA3651568aD43C19109f834B88Ea', costPerPerson*1040000).then(() => setApproved(true));
+    const approveTx = await contract.approve('0xc44a1A274F81dA3651568aD43C19109f834B88Ea', costPerPerson*1040000);
+    await approveTx.wait();
+    setApproved(true)
+    setLoading(false);
   }catch{
     console.log("Approval error");
+    setLoading(false);
   }
 }
 const joinStay = async () => {
@@ -77,6 +81,7 @@ const joinStay = async () => {
     setLoading(false);
   }catch{
     console.log("Smart contract tx error");
+    setLoading(false);
   }
 }
   return (
@@ -132,17 +137,29 @@ const joinStay = async () => {
                 <div className="w-full grid grid-cols-2 mt-6 lg:mt-20">
                   <h2 className="text-xl ml-5 ">You Pay: </h2>
                   <div className="w-full flex justify-end">
-                    <p className="font-black mr-5 text-2xl lg:text-4xl">${(parseInt(stay.price)/parseInt(stay.spots)).toFixed(2)}</p>
+                    <p className="mr-5 text-2xl lg:text-2xl">${((parseInt(stay.price)/parseInt(stay.spots))*1.04).toFixed(2)}</p>
                   </div>
                 </div>
                 <div className="flex justify-center w-full mt-2">
                   {approved ? 
-                  <button onClick={() => joinStay()} className="w-11/12 bg-indigo-600 py-4 rounded-xl font-bold text-white cursor-pointer">
-                      JOIN
+                      <button onClick={() => joinStay()} className="w-11/12 bg-indigo-600 py-4 flex justify-center rounded-xl font-bold text-white cursor-pointer">
+                    {loading ? 
+                    <div className='spinner-white'></div>
+                    :
+                    <p>
+                      Join
+                    </p>
+                    }
                   </button> 
                   :
-                  <button onClick={() => approveERC20()} className="w-11/12 bg-indigo-600 py-4 rounded-xl font-bold text-white cursor-pointer">
-                      APPROVE
+                  <button onClick={() => approveERC20()} className="w-11/12 flex justify-center bg-indigo-600 py-4 rounded-xl font-bold text-white cursor-pointer">
+                    {loading ? 
+                    <div className='spinner-white'></div>
+                    :
+                    <p>
+                      Approve
+                    </p>
+                    }
                   </button>               
                   }
                 </div>
