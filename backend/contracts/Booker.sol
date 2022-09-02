@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
@@ -56,19 +56,18 @@ contract Booker is Ownable, ERC721, ERC721URIStorage{
         if(stayToJoin.spots == 0){
             token.transferFrom(address(this), ownerAddress, stayToJoin.fundsRaised);
             emit BookStay(msg.sender, stayId, stayToJoin.fundsRaised);
+            delete stays[stayId];
         }else{
             emit JoinStay(msg.sender, amount);
         }
     }
-
-    function setFee(uint256 newFee) public onlyOwner {
-        fee = newFee;
+    function getStay(string calldata id) external view returns(Stay memory){
+        return stays[id];
     }
-
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        override(ERC721, ERC721URIStorage)
+    function setFee(uint256 feePercentage) public onlyOwner {
+        fee = feePercentage;
+    }
+    function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage)
         returns (string memory)
     {
         return super.tokenURI(tokenId);
