@@ -22,23 +22,6 @@ const Navbar: React.FC<{style:string, showNav: boolean}> = ({style, showNav}) =>
       {showMobileMenu ? <MobileMenu onCloseModal={() => setShowMobileMenu(false)}/> : ''}
       </div>
       <div className={showNav ? "fixed z-40 lg:z-40 top-0 w-full backdrop-blur flex items-center justify-end py-7 pb-16 lg:pb-2" : "fixed z-40 lg:z-20 top-0 w-full backdrop-blur lg:backdrop-blur-none flex py-7 pb-16 lg:pb-2"}>
-      <Link href="/">
-        <div className="h-24 w-48 mt-4 fixed top-0 left-2 cursor-pointer hover:scale-105 transition ease-in duration-180">
-            {style === "light" ? 
-            <Image
-                src={logo}
-                alt="logo"
-                layout="responsive"
-            />
-            :
-            <Image
-                src={blackLogo}
-                alt="logo"
-                layout="responsive"
-            />
-            }
-        </div>
-      </Link>
       <div>
       {showNav && 
       <div className="z-20 top-0 w-full hidden lg:flex items-center justify-end">

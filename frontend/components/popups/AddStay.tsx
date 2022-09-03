@@ -11,6 +11,7 @@ import { HiOutlinePhotograph, HiOutlineCheckCircle } from 'react-icons/hi';
 import { create, CID, IPFSHTTPClient } from "ipfs-http-client";
 import { useAccount, useNetwork, useSendTransaction } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useContractFunction } from '@usedapp/core';
 
 const fileTypes = ["JPG", "PNG"];
 const projectId = process.env.NEXT_PUBLIC_IPFS_PROJECT_ID;
@@ -32,26 +33,39 @@ type DateRange = {
 }
 const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Dec"]
 
-export default function Signin(props: {onCloseModal: any, link: string, price: string, dates: DateRange, eventName: string, spots: string, image: string}){
+export default function AddStay(props: {onCloseModal: any, link: string, price: string, dates: DateRange, eventName: string, spots: string, image: string}){
 
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [step, setStep] = useState(1);
   const [stayId, setStayId] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [disabled, setDisabled] = useState(true);
 
   const { address, isConnected: isWagmiConnected } = useAccount();
   const { data: signer } = useSigner();
+  const contractInterface = new ethers.utils.Interface(Booker.abi);
+  const contract = new ethers.Contract('0xc44a1A274F81dA3651568aD43C19109f834B88Ea', contractInterface, signer!);
+  let { state, send } = useContractFunction(contract, 'addStay', {});
 
     const handleCloseClick = () => {
         props.onCloseModal();
     };
 
+    useEffect(() => {
+      console.log(state.status);
+      if (state.status == 'Mining') {
+        console.log("loaded")
+        console.log(state.status)
+        setDisabled(false);
+        setLoading(false);
+      }
+    }, [state])
+
     const addStay = async (e: React.FormEvent<HTMLFormElement>) => {
       setLoading(true);
       e.preventDefault();
       if(!signer) return;
-      const contract = new ethers.Contract('0xc44a1A274F81dA3651568aD43C19109f834B88Ea', Booker.abi, signer) as BookerType;
       const subdomain = 'https://staverse.infura-ipfs.io';
       const date = `${(props.dates.startDate).getDate()} ${months[(props.dates.startDate).getMonth()]}-${(props.dates.endDate).getDate()} ${months[(props.dates.endDate).getMonth()]}`
       let URL = "";
@@ -74,15 +88,14 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
         date: date
       }).then(async (docRef) => {
         setStayId(docRef.id);
-        const costPerPerson = parseInt(props.price)/parseInt(props.spots)*1000000;
+        const costPerPerson = (parseInt(props.price)/parseInt(props.spots)*1000000).toFixed(0);
         try{
-          const addTx = await contract.addStay(docRef.id, costPerPerson, props.spots,URL);
-          await addTx.wait();
+          send(docRef.id, costPerPerson, props.spots, URL);
           setStep(2);
         }catch{
           console.log("Smart contract tx error");
+          setLoading(false);
         }
-        setLoading(false);
       });
     }
 
@@ -181,6 +194,7 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
           <Link href={`/stays/${stayId}`}>
             <button
               className="w-full flex justify-center py-4 px-4 border mt-8 border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black"
+              onClick={() => handleCloseClick()}
             >
               View my offer
             </button>
@@ -192,8 +206,8 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
 
   return(
     <div className='fixed z-50 w-full h-screen flex justify-center items-center  backdrop-blur-lg cursor-pointer' onClick={handleCloseClick}>
-      {step === 1 && stepOne()}
-      {step === 2 && stepTwo()}
+      {(step === 1) && stepOne()}
+      {(step === 2) && stepTwo()}
     </div>
   )
 };
