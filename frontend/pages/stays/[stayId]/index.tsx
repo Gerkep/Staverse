@@ -14,7 +14,6 @@ import {HiOutlinePhotograph} from "react-icons/hi";
 import Link from "next/link";
 import Image from "next/image";
 import Loading from "../../../components/Loading";
-import { useContractFunction, useTokenAllowance } from "@usedapp/core";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const stayId = context.params?.stayId
@@ -42,11 +41,6 @@ export default function Stay({ stay, stayId }: InferGetServerSidePropsType<typeo
   const { data: signer } = useSigner();
   const [approved, setApproved] = useState(false);
   const [spots, setSpots] = useState(0);
-  
-  const contractInterface = new ethers.utils.Interface(Booker.abi);
-  const contractWithSigner = new ethers.Contract('0xc44a1A274F81dA3651568aD43C19109f834B88Ea', contractInterface, signer!);
-  const { state, send } = useContractFunction(contractWithSigner, 'joinStay', {});
-
 
   useEffect(() => {
     const getSpots = async () => {
@@ -78,8 +72,12 @@ const joinStay = async () => {
   const contract = new ethers.Contract('0xc44a1A274F81dA3651568aD43C19109f834B88Ea', Booker.abi, signer) as BookerType;
   try{
     const costPerPerson = parseInt(stay.price)/parseInt(stay.spots);
-    send('0x88e8676363E1d4635a816d294634905AF292135A', costPerPerson*1040000, stayId);
+    const joinTx = await contract.joinStay('0x88e8676363E1d4635a816d294634905AF292135A', costPerPerson*1040000, stayId);
+    await joinTx.wait();
     const stayStruct = await contract.getStay(stayId);
+    if(stayStruct[3] === 0){
+      await deleteDoc(doc(db, "Stays", stayId));
+    }
     setLoading(false);
   }catch{
     console.log("Smart contract tx error");
