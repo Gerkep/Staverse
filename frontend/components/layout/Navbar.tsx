@@ -21,7 +21,7 @@ const Navbar: React.FC<{style:string, showNav: boolean}> = ({style, showNav}) =>
       {showCreationModal ? <Create onCloseModal={() => setShowCreationModal(false)}/> : '' }
       {showMobileMenu ? <MobileMenu onCloseModal={() => setShowMobileMenu(false)}/> : ''}
       </div>
-      <div className={showNav ? "fixed z-40 lg:z-40 top-0 w-full backdrop-blur flex items-center justify-end py-7 pb-16 lg:pb-2" : "fixed z-40 lg:z-20 top-0 w-full backdrop-blur lg:backdrop-blur-none flex py-7 pb-16 lg:pb-2"}>
+      <div className={showNav ? "fixed z-40 lg:z-40 top-0 w-full backdrop-blur flex items-center justify-end py-7 pb-16 lg:pb-2" : "fixed z-40 lg:z-20 top-0 w-full backdrop-blur lg:backdrop-blur-none flex justify-end py-7 pb-16 lg:pb-2"}>
       <Link href="/">
         <div className="h-24 w-48 mt-4 fixed top-0 left-2 cursor-pointer hover:scale-105 transition ease-in duration-180">
             {style === "light" ? 
@@ -40,7 +40,7 @@ const Navbar: React.FC<{style:string, showNav: boolean}> = ({style, showNav}) =>
         </div>
       </Link>
       <div>
-      {showNav && 
+      {showNav ? 
       <div className="z-20 top-0 w-full hidden lg:flex items-center justify-end">
         {style === "light" ? 
         <Link href="/profile"><p className="mr-10 text-white text-xl font-base cursor-pointer hover:scale-105 transition ease-in duration-180">Profile</p></Link>
@@ -51,6 +51,12 @@ const Navbar: React.FC<{style:string, showNav: boolean}> = ({style, showNav}) =>
             bg-indigo-600 flex items-center text-base hover:scale-105 transition ease-in duration-180 shadow-[2px_2px_10px_rgba(0,0,0,0.25)] font-bold">
             <AddIcon className="h-4 w-4 mr-2"/>Add Stay
           </button>
+      </div>
+      :
+      <div className="z-20 top-0 w-full hidden lg:flex items-center justify-end">
+        <div className="mr-4">
+          <ConnectButton />
+        </div>
       </div>
       }
       {showMobileMenu ?

@@ -89,7 +89,7 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
     const stepOne = () => {
       return (
         <div className="sm:mx-auto sm:w-full sm:max-w-md rounded-xl border-4 border-black shadow-[20px_20px_0_rgba(0,0,0,1)] cursor-auto">
-        <div className="bg-white py-8 pb-16 px-4  shadow sm:rounded-lg sm:px-10 cursor-auto v" onClick={(e) => e.stopPropagation()}>
+        <div className="bg-white py-8 pb-16 px-4 shadow sm:rounded-lg sm:px-10 cursor-auto v" onClick={(e) => e.stopPropagation()}>
           <h1 className=' text-center font-bold text-3xl'>Who is booking?</h1>
           <div className='flex pb-8 w-full justify-center'>
                   <p className='text-center mt-8 text-gray-500'>Note: We need your email to add you to bookings and send details on your reservations.</p>
@@ -154,7 +154,7 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
                   Add Stay
                 </p>
                 }
-              </button>           
+              </button>
               :
               <div className='w-full flex justify-center mt-12'>
                   <ConnectButton />   
