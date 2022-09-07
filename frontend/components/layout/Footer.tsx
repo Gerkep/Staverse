@@ -1,6 +1,6 @@
 import Link from "next/link"
 import Image from 'next/image'
-import logo from '../../public/img/staverse-house-black.png'
+import logo from '../../public/img/hh-house-black.png'
 
 const navigation = [{name: "Privacy policy", href: "#"}, {name: "Twitter", href: "#"}, {name: "Contact us", href: "#"}]
 
