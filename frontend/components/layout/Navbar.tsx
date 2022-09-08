@@ -23,7 +23,7 @@ const Navbar: React.FC<{style:string, showNav: boolean}> = ({style, showNav}) =>
       </div>
       <div className={showNav ? "fixed z-40 lg:z-40 top-0 w-full backdrop-blur flex items-center justify-end py-7 pb-16 lg:pb-2" : "fixed z-40 lg:z-20 top-0 w-full backdrop-blur lg:backdrop-blur-none flex justify-end py-7 pb-16 lg:pb-2"}>
       <Link href="/">
-        <div className="h-10 w-36 fixed top-0 left-2 cursor-pointer hover:scale-105 transition ease-in duration-180">
+        <div className="h-10 w-36 fixed top-2 lg:top-0 left-2 cursor-pointer hover:scale-105 transition ease-in duration-180">
             {style === "light" ? 
             <Image
                 src={logo}

@@ -11,7 +11,7 @@ module.exports = {
     },
     colors: {
       'light-green': '#76FFBA',
-      'subtle-violet': '#AF93FF'
+      'subtle-violet': '#F0EFF4'
     },
     backgroundImage: {
       'background': "url('../public/img/staverse-background.png')",
@@ -25,7 +25,8 @@ module.exports = {
       'stay1': "url('../public/img/stay-1.png')",
       'stay2': "url('../public/img/stay-2.png')",
       'stay3': "url('../public/img/stay-3.png')",
-      'dimmedBackground': "url('../public/img/background-dim-long.png')"
+      'dimmedBackground': "url('../public/img/background-dim-long.png')",
+      'NYCProfile': "url('../public/img/NYC_profile.jpg')"
     },
     spacing: {
       '32': '32rem',

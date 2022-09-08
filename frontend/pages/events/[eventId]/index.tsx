@@ -76,7 +76,7 @@ export default function Event({ event }: InferGetServerSidePropsType<typeof getS
       return(
         <div key={stay.id}>
         {stay.data.eventName === event.name &&
-        <div  className="w-80 ml-12 mr-12 mt-28 rounded-xl relative">
+        <div  className="w-80 lg:ml-12 lg:mr-12 mb-16 lg:mb-0 lg:mt-28 rounded-xl relative">
           <div className="w-full h-80 rounded-md shadow-[1px_1px_25px_rgba(0,0,0,0.24)] hover:scale-105 transition ease-in duration-180 cursor-pointer overflow-hidden relative">
             {stay.data.image ? 
             <Link href={`/stays/${stay.id}`}><Image alt="stayImage" layout='fill' objectFit='cover'  src={stay.data.image}></Image></Link>
@@ -102,7 +102,7 @@ export default function Event({ event }: InferGetServerSidePropsType<typeof getS
       )
     })
     return (
-      <div className="flex flex-wrap mt-4 justify-center py-8 pb-0 items-center z-10 bg-white">
+      <div className="flex flex-wrap mt-4 justify-center py-8 pb-0 items-center z-10 bg-white w-full">
         {staysList}
       </div>
     )
@@ -112,7 +112,7 @@ export default function Event({ event }: InferGetServerSidePropsType<typeof getS
       <Loading />
       <Navbar style="dark" showNav={true}/>
       <div className="w-full h-full pt-2 bg-[#F0EFF4] pb-20 top-0 lg:fixed">
-        <div className="w-10/12 lg:w-11/12 ml-8 lg:py-4 lg:h-72 bg-gray-100 overflow-hidden flex flex-wrap border-4 border-black shadow-[12px_15px_0_rgba(0,0,0,1)] rounded-xl mt-28 ">
+        <div className="w-10/12 lg:w-11/12 ml-8 lg:py-4 lg:h-72 bg-gray-100 overflow-hidden flex flex-wrap border-4 border-black shadow-[12px_15px_0_rgba(0,0,0,1)] rounded-xl mt-28 lg:mt-28 ">
           <div className="grid lg:grid-cols-3 w-full">
             <div className="col-span-2">
               <div className="w-full lg:w-1/3 lg:h-1/4 rounded-r-xl lg:shadow-[4px_4px_8px_rgba(0,0,0,0.15)] relative">

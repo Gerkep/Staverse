@@ -14,6 +14,9 @@ import { collection, query, where, getDocs, doc, getDoc } from "firebase/firesto
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import { db } from "../firebase/clientApp";
 import Loading from "../components/Loading";
+import { IoDesktop, IoLogoDiscord, IoLogoTwitter } from "react-icons/io5";
+import MailchimpSubscribe, { EmailFormFields } from "react-mailchimp-subscribe"
+import NewsletterForm from "../components/layout/NewsletterForm";
 const fileTypes = ["JPG", "PNG"];
 
 const eventsList = ["ETHBogota", "ETHSanFrancisco"];
@@ -52,6 +55,7 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
   const [dateRange, setDateRange] = useState({startDate: new Date(), endDate: new Date(), key: 'selection'})
   const [showCallendar, setShowCallendar] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(true);
 
   const handleChange = (image: File) => {
     setImage(image);
@@ -77,14 +81,15 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
     const eventList = events.map((event: Event) => {
       return (
         <Link key={event.data.name} href={`/events/${event.id}`}>
-          <div className="w-11/12 lg:w-4/12 h-64 bg-white shadow-[12px_15px_0_rgba(0,0,0,1)] border-4 lg:ml-12 lg:mr-12 mt-16 border-black rounded-xl hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180 cursor-pointer">
-              <div className={`w-full h-40 rounded-xl overflow-hidden relative`}>
+          <div className="w-11/12 lg:w-4/12 lg:h-64 bg-gray-100 lg:bg-white lg:shadow-[12px_15px_0_rgba(0,0,0,1)]
+           pb-4 lg:pb-2 shadow-[5px_5px_30px_rgba(0,0,0,0.20)] border-4 lg:ml-12 lg:mr-12 mt-16 border-gray-200 lg:border-black rounded-2xl hover:scale-105 lg:hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180 cursor-pointer">
+              <div className={`w-full h-20 lg:h-40 rounded-xl overflow-hidden relative`}>
                 <Image alt="stayImage" layout='fill' objectFit='cover'  src={event.data.imageURL}></Image>
               </div>
               <div className="w-full grid grid-cols-2 grid-rows-2 items-center">
-                <h3 className="text-2xl ml-2 mt-2 font-bold text-gray-900">{event.data.name}</h3>
-                <p className="text-right mt-2 text-lg leading-6 font-medium text-gray-500 mr-2 mt-2">{event.data.dateRange}</p>
-                <p className="ml-2 text-lg leading-6 font-medium text-gray-500">{event.data.organizer}</p>
+                <h3 className="text-2xl ml-2 mt-6 lg:mt-2 font-bold text-gray-900">{event.data.name}</h3>
+                <p className="text-right mt-2 text-lg leading-6 font-medium text-gray-500 mr-2 mt-6 lg:mt-2">{event.data.dateRange}</p>
+                <p className="ml-2 text-lg leading-6 font-medium text-gray-500 mt-2 lg:mt-0">{event.data.organizer}</p>
                 <p> </p>
               </div>
           </div>
@@ -103,13 +108,13 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
       <Loading />
       <Navbar style="dark" showNav={false}/>
       <div className="lg:w-1/2 fixed mt-36 lg:mt-48 lg:pr-28 w-full">
-          <h1 className="text-5xl xl:text-7xl text-center lg:text-left lg:ml-8 font-black"><span className="text-indigo-600">Book a stay</span> for your next hack.</h1>
+          <h1 className="px-8 lg:px-0 text-5xl xl:text-7xl text-center lg:text-left lg:ml-8 font-black"><span className="text-indigo-600">Book a stay</span> for your next hack.</h1>
           <p className="w-full px-2 lg:px-0 lg:pr-8 lg:w-5/6 lg:ml-8 mt-10 text-xl text-center lg:text-left lg:text-2xl lg:font-bold text-gray-500 lg:text-black">
           Because all hackers deserve a great place to stay during hackathon!</p>
           <div className="w-full lg:w-auto flex lg:block justify-center">
-          <a href="#upcoming "><button className="border-4 border-black text-black shadow-[12px_12px_0_rgba(0,0,0,1)] font-bold rounded-xl 
-          px-16 xl:px-24 py-6 text-xl lg:text-2xl lg:ml-8 mt-20 hover:scale-105 transition ease-in duration-240 hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180">
-            Upcoming Events
+          <a href="#newsletter"><button className="lg:border-4 border-black text-white lg:text-black shadow-[2px_2px_30px_rgba(0,0,0,0.25)] lg:shadow-[12px_12px_0_rgba(0,0,0,1)] font-bold rounded-xl bg-indigo-600 lg:bg-white
+          px-16 xl:px-24 py-6 text-xl lg:text-2xl lg:ml-8 mt-20 hover:scale-105 transition ease-in duration-240 hover:scale-105 lg:hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180">
+            Join waitlist!
           </button></a>
           </div>
         </div>
@@ -252,15 +257,15 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
           </div>
           </div>
       </div>
-      <div style={{marginTop: "100vh"}} className="z-40 bg-white w-full absolute border-t-8 border-black ">
+      <div style={{marginTop: "100vh"}} className="z-40 bg-white w-full absolute border-t-4 shadow-[0_-2px_35px_rgba(0,0,0,0.2)] border-gray-200 lg:border-t-8 lg:border-black ">
       <div className="pt-12 sm:pt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl lg:text-5xl tracking-tight font-black lg:font-bold text-gray-900 sm:tracking-tight">
             Trusted by devs from 5 continents
           </h2>
-          <p className="mt-3 text-xl text-gray-500 sm:mt-4">
-            First ever crypto booking service designed to book accommodation for your next web3 event.
+          <p className="mt-4 lg:mt-3 text-xl text-gray-500 sm:mt-4">
+            Booking service designed to book accommodation for your next hackathon.
           </p>
         </div>
       </div>
@@ -269,7 +274,7 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
           <div className="absolute inset-0 h-1/2" />
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto flex justify-center w-full">
-              <dl className="w-10/12 rounded-lg bg-white shadow-[12px_15px_0_rgba(0,0,0,1)] hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180 border-4 border-black sm:grid sm:grid-cols-3">
+              <dl className="w-10/12 py-4 lg:py-0 rounded-lg bg-white shadow-[12px_15px_0_rgba(0,0,0,1)] hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180 border-4 border-black sm:grid sm:grid-cols-3">
                 <div className="flex flex-col border-b border-gray-100 p-6 text-center sm:border-0 sm:border-r">
                   <dt className="order-2 mt-2 text-lg leading-6 font-medium text-gray-500">Refund Guarantee</dt>
                   <dd className="order-1 text-5xl tracking-tight font-bold text-indigo-600 ">100%</dd>
@@ -288,7 +293,7 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
         </div>
       </div>
     </div>
-    <div style={{backgroundColor: "#F0EFF4"}} className="py-24">
+    <div className="py-24 lg:bg-subtle-violet">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl lg:text-5xl tracking-tight font-black lg:font-bold text-gray-900 sm:tracking-tight">
@@ -300,11 +305,11 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
         </div>
       </div>
       <div className="flex flex-wrap lg:flex-nowrap lg:mt-8 justify-center py-12 items-center">
-        <div className="w-72 h-96 mt-20 lg:mt-8 bg-white shadow-[12px_15px_0_rgba(0,0,0,1)] border-4 border-black rounded-xl flex flex-wrap justify-center ml-10 mr-10 hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180">
+        <div className="w-72 h-96 mt-2 lg:mt-8 bg-white shadow-[12px_15px_0_rgba(0,0,0,1)] border-4 border-black rounded-xl flex flex-wrap justify-center ml-10 mr-10 hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180">
           <div className="w-full h-40 bg-backblur bg-center bg-cover rounded-md"></div>
           <div className="w-20 h-20 bg-createIcon bg-center bg-contain bg-no-repeat absolute mt-8"></div>
           <h3 className="text-center font-black text-3xl ">Add stay</h3>
-          <p className="text-center font-medium text-l w-5/6">Find a stay on service like Airbnb, copy the link and add new offer to our platform.</p>
+          <p className="text-center text-gray-500 lg:text-gray-900 font-bold lg:font-medium text-l w-5/6">Find a stay on service like Airbnb, copy the link and add new offer to our platform.</p>
         </div>
         <div className="w-14 h-10 hidden lg:block bg-arrow bg-center bg-contain bg-no-repeat ml-6">
         </div>
@@ -312,7 +317,7 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
           <div className="w-full h-40 bg-backblur bg-center bg-cover rounded-md"></div>
           <div className="w-20 h-20 bg-sendIcon bg-center bg-contain bg-no-repeat absolute mt-8"></div>
           <h3 className="text-center font-black text-3xl">Fund it</h3>
-          <p className="text-center font-medium text-l w-5/6">You can book alone or with frens. All funds will be safely stored on a smart contract.</p>
+          <p className="text-center text-gray-500 lg:text-gray-900 font-bold lg:font-medium text-l w-5/6">You can book alone or with frens. All funds will be safely stored on a smart contract.</p>
         </div>
         <div className="w-14 h-10 hidden lg:block bg-arrow bg-center bg-contain bg-no-repeat ml-6">
         </div>
@@ -320,12 +325,12 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
           <div className="w-full h-40 bg-backblur bg-center bg-cover rounded-md"></div>
           <div className="w-20 h-20 bg-checkIcon bg-center bg-contain bg-no-repeat absolute mt-8"></div>
           <h3 className="text-center font-black text-3xl">Book it</h3>
-          <p className="text-center font-medium text-l w-5/6">Once the price target is met you confirm booking and receive details within 24h.</p>
+          <p className="text-center text-gray-500 lg:text-gray-900 font-bold lg:font-medium text-l w-5/6">Once the price target is met you confirm booking and receive details within 24h.</p>
         </div>
       </div>
     </div>
   
-    <div className="pt-24 pb-12" id="upcoming">
+    <div className="pt-24 pb-24" id="upcoming">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl lg:text-5xl tracking-tight font-black lg:font-bold text-gray-900 sm:tracking-tight">
@@ -335,6 +340,54 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
         </div>
       </div>
         {renderEvents()}
+      </div>
+
+      <div className="w-full flex flex-wrap text-center pt-28 pb-12 justify-center" id="newsletter">
+      <h2 className="text-4xl lg:text-5xl tracking-tight font-black lg:font-bold text-gray-900 sm:tracking-tight w-full">
+           Behind the scenes
+          </h2>
+        <div className="mt-16 w-11/12 lg:w-8/12 pb-12 bg-gray-100 shadow-[5px_5px_40px_rgba(0,0,0,0.20)] border-4 border-gray-200 rounded-2xl">
+          <div className="grid lg:grid-cols-2">
+          <div className="w-full flex py-6 px-6">
+            <div className="w-24 h-24 lg:w-36 lg:h-36 bg-NYCProfile bg-cover bg-center rounded-full overflow-hidden relative"></div>
+            <div className="grid grid-rows-2 pl-6 text-left h-20">
+              <h2 className="text-2xl lg:text-4xl font-black text-gray-900 mt-2">Piotr Gerke</h2>
+              <p className="text-gray-400 text-sm lg:text-lg mt-1 lg:mt-4 font-medium">1X ETHAmsterdam🥇 <br></br> 1X ETHWarsaw🥇</p>
+            </div>
+          </div>
+          <div className="justify-end w-full mt-6 hidden lg:flex">
+              <IoLogoTwitter className="text-indigo-600 h-8 w-8 mr-8 lg:mr-12 mt-8 ml-8 lg:ml-0 mb-6 lg:mt-0 cursor-pointer hover:text-gray-900 transition ease-in duration-180"></IoLogoTwitter>
+              <IoLogoDiscord className="text-indigo-600 h-8 w-8 mr-8 lg:mr-12 mt-8 mb-6 lg:mt-0 cursor-pointer hover:text-gray-900 transition ease-in duration-180"></IoLogoDiscord>
+              <IoDesktop className="text-indigo-600 h-8 w-8 mr-8 lg:mr-12 mt-8 mb-6 lg:mt-0 cursor-pointer hover:text-gray-900 transition ease-in duration-180"></IoDesktop>
+            </div>
+          </div>
+          <div className="w-full flex justify-center">
+            <div className="border-t-4 border-gray-200 w-11/12"></div>
+          </div>
+          <p className="px-6 lg:px-8 mt-10 font-bold text-gray-900 lg:text-left lg:text-xl lg:w-4/6">Gm! I’m glad to see you there!<br /> I’m here to help you book the best accommodation, so that you can make the most out of your next hackathon!</p>
+          <p className="mt-10 mb-6 font-bold text-gray-400 lg:text-left lg:ml-8 lg:text-xl lg:text-gray-900">I will onboard you ASAP!👇🏼</p>
+          <MailchimpSubscribe
+                url={process.env.NEXT_PUBLIC_MAILCHIMP_URL!}
+                render={({ subscribe, status }) => (
+                <div className='mt-6 md:mt-2'>
+                  <NewsletterForm onSubmitted={(formData: EmailFormFields) => subscribe(formData)} />
+                  {(status == "success" && success == true) && 
+                  <div onClick={() => setSuccess(false)} className="h-full w-full fixed top-0 left-0">
+                  <div onClick={(e) => e.stopPropagation()} className='w-11/12 md:w-3/12 h-36 bg-gray-100 fixed right-5 md:left-auto top-5 md:right-5 border-gray-200 border-4 rounded-md shadow-[10px_10px_40px_-5px_rgba(0,0,0,0.25)]'>
+                    <button type="button" onClick={() => setSuccess(false)} className="rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 fixed top-7 right-7">
+                        <span className="sr-only">Close menu</span>
+                        <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                    <h2 className='mt-5 font-bold text-3xl text-emerald-300'>Success!</h2>
+                    <p className='font-medium mt-4 text-xl'>I will reach you out soon👊🏼</p>
+                    </div>
+                    </div>}
+                </div>
+                )}
+        />
+        </div>
       </div>
       <Footer />
       </div>

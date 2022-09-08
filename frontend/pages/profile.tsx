@@ -60,7 +60,7 @@ export default function Profile() {
       <div className="w-full h-80 bg-dimmedBackground bg-cover bg-bottom bg-no-repeat fixed top-0 z-0">
       </div>
       <div className="w-full flex justify-center">
-        <div className="absolute top-40 rounded-xl pt-8 pb-16 border-4 border-black shadow-[12px_15px_0_rgba(0,0,0,1)] w-11/12 lg:w-10/12 bg-white">
+        <div className="absolute top-28 lg:top-40 rounded-xl pt-8 pb-16 border-4 border-black shadow-[12px_15px_0_rgba(0,0,0,1)] w-11/12 lg:w-10/12 bg-white">
           <h2 className="text-4xl text-gray-900 font-black ml-8">Hello there!</h2>
           <div className="w-full flex justify-center h-full mt-8">
             <div className="w-11/12 h-96 bg-gray-200 pb-10 mx-0-auto rounded-xl overflow-scroll">
