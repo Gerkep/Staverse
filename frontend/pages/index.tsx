@@ -111,7 +111,7 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
         <div>
             <h1 className="px-8 lg:px-0 text-5xl xl:text-7xl text-center lg:text-left lg:ml-8 font-black"><span className="text-indigo-600">Book a stay</span> for your next hack.</h1>
             <div className="w-full flex justify-center lg:justify-start">
-              <div className="w-10/12 lg:w-5/6 h-44 bg-guarantee bg-contain bg-no-repeat mt-12 lg:ml-8 lg:mt-12"></div>
+              <div className="w-10/12 lg:w-5/6 h-44 flex justify-center lg:justify-start bg-guarantee bg-contain bg-no-repeat mt-12 lg:ml-8 lg:mt-12"></div>
             </div>
             <div className="w-full lg:w-auto flex lg:block justify-center">
             <Link href="/events/avUJdtt1DBsbRb23kYWL"><button className="lg:border-4 border-black text-white lg:text-black shadow-[2px_2px_30px_rgba(0,0,0,0.25)] lg:shadow-[12px_12px_0_rgba(0,0,0,1)] font-bold rounded-xl bg-indigo-600 lg:bg-white
