@@ -107,19 +107,22 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
     <div onClick={() => setShowCallendar(false)}>
       <Loading />
       <Navbar style="dark" showNav={false}/>
-      <div className="lg:w-1/2 fixed mt-36 lg:mt-48 lg:pr-28 w-full">
-          <h1 className="px-8 lg:px-0 text-5xl xl:text-7xl text-center lg:text-left lg:ml-8 font-black"><span className="text-indigo-600">Book a stay</span> for your next hack.</h1>
-          <p className="w-full px-2 lg:px-0 lg:pr-8 lg:w-5/6 lg:ml-8 mt-10 text-xl text-center lg:text-left lg:text-2xl lg:font-bold text-gray-500 lg:text-black">
-          Because all hackers deserve a great place to stay during hackathon!</p>
-          <div className="w-full lg:w-auto flex lg:block justify-center">
-          <a href="#newsletter"><button className="lg:border-4 border-black text-white lg:text-black shadow-[2px_2px_30px_rgba(0,0,0,0.25)] lg:shadow-[12px_12px_0_rgba(0,0,0,1)] font-bold rounded-xl bg-indigo-600 lg:bg-white
-          px-16 xl:px-24 py-6 text-xl lg:text-2xl lg:ml-8 mt-20 hover:scale-105 transition ease-in duration-240 hover:scale-105 lg:hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180">
-            Join waitlist!
-          </button></a>
+      <div className="lg:w-1/2 lg:h-full fixed mt-36 lg:mt-0 lg:pr-28 w-full flex lg:flex-wrap lg:items-center">
+        <div>
+            <h1 className="px-8 lg:px-0 text-5xl xl:text-7xl text-center lg:text-left lg:ml-8 font-black"><span className="text-indigo-600">Book a stay</span> for your next hack.</h1>
+            <div className="w-full flex justify-center lg:justify-start">
+              <div className="w-10/12 lg:w-5/6 h-44 bg-guarantee bg-contain bg-no-repeat mt-12 lg:ml-8 lg:mt-12"></div>
+            </div>
+            <div className="w-full lg:w-auto flex lg:block justify-center">
+            <Link href="/events/avUJdtt1DBsbRb23kYWL"><button className="lg:border-4 border-black text-white lg:text-black shadow-[2px_2px_30px_rgba(0,0,0,0.25)] lg:shadow-[12px_12px_0_rgba(0,0,0,1)] font-bold rounded-xl bg-indigo-600 lg:bg-white
+            px-16 xl:px-20 py-6 text-xl lg:text-2xl lg:ml-8 mt-8 lg:mt-16 hover:scale-105 transition ease-in duration-240 hover:scale-105 lg:hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180">
+              Book for Bogota!
+            </button></Link>
+            </div>
           </div>
-        </div>
+      </div>
       {showModal ? <AddStay onCloseModal={() => setShowModal(false)} link={link} price={price} dates={dateRange} eventName={eventName} spots={spots} image={image}/> : '' }
-      <div className="polygon h-screen w-8/12 hidden lg:block bg-stay2 bg-cover bg-right z-0 shadow-[0px_20px_0_rgba(0,0,0,1)] fixed right-0 top-0 flex items-center">
+      <div className="polygon h-full w-8/12 hidden lg:block bg-stay2 bg-cover bg-right z-0 shadow-[0px_20px_0_rgba(0,0,0,1)] fixed right-0 top-0 flex items-center">
       <div className="mt-28 absolute right-20 shadow-[20px_20px_0_rgba(0,0,0,1)] border-4 border-black rounded-2xl overflow-hidden">
           <div  className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 ">
             <h2 className="text-center text-3xl font-bold">Add <span className="text-indigo-600">new stay</span></h2>
@@ -222,7 +225,7 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
               </div>
 
               <label htmlFor="spots" className="block text-sm font-medium text-gray-700">
-                    Image <span className="text-gray-400 font-light">optional</span>
+                    Image <span className="text-gray-400 font-light"></span>
               </label>
               <FileUploader handleChange={handleChange} name="file" types={fileTypes} multiple={false} label="Drop an image" >
                 {image ? 
@@ -258,7 +261,18 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
           </div>
       </div>
       <div style={{marginTop: "100vh"}} className="z-40 bg-white w-full absolute border-t-4 shadow-[0_-2px_35px_rgba(0,0,0,0.2)] border-gray-200 lg:border-t-8 lg:border-black ">
-      <div className="pt-12 sm:pt-24">
+      <div className="py-24 lg:pt-36 lg:pb-36" id="upcoming">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl lg:text-5xl tracking-tight font-black lg:font-bold text-gray-900 sm:tracking-tight">
+           Upcoming web3 events
+          </h2>
+          <p className="mt-4 font-bold text-indigo-500 text-lg">YOU DO NOT WANT TO MISS</p>
+        </div>
+      </div>
+        {renderEvents()}
+    </div>
+    {/* <div className="pt-12 sm:pt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl lg:text-5xl tracking-tight font-black lg:font-bold text-gray-900 sm:tracking-tight">
@@ -292,12 +306,12 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
           </div>
         </div>
       </div>
-    </div>
-    <div className="py-24 lg:bg-subtle-violet">
+    </div> */}
+    <div className="py-24 lg:py-24 lg:mt-24 lg:bg-subtle-gray">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl lg:text-5xl tracking-tight font-black lg:font-bold text-gray-900 sm:tracking-tight">
-           How can I do it?
+           How can I book?
           </h2>
           <p className="mt-3 text-xl text-gray-500 sm:mt-4">
             Find accommodation on your favorite booking service and book with us for crypto.
@@ -329,24 +343,12 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
         </div>
       </div>
     </div>
-  
-    <div className="pt-24 pb-24" id="upcoming">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl lg:text-5xl tracking-tight font-black lg:font-bold text-gray-900 sm:tracking-tight">
-           Upcoming web3 events
-          </h2>
-          <p className="mt-4 font-bold text-indigo-500 text-lg">YOU DO NOT WANT TO MISS</p>
-        </div>
-      </div>
-        {renderEvents()}
-      </div>
 
-      <div className="w-full flex flex-wrap text-center pt-28 pb-12 justify-center" id="newsletter">
+      <div className="w-full flex flex-wrap text-center py:24 lg:pt-36 pb-12 justify-center " id="newsletter">
       <h2 className="text-4xl lg:text-5xl tracking-tight font-black lg:font-bold text-gray-900 sm:tracking-tight w-full">
            Behind the scenes
           </h2>
-        <div className="mt-16 w-11/12 lg:w-8/12 pb-12 bg-gray-100 shadow-[5px_5px_40px_rgba(0,0,0,0.20)] border-4 border-gray-200 rounded-2xl">
+        <div className="mt-12 w-11/12 lg:w-8/12 pb-12 bg-gray-100 shadow-[5px_5px_40px_rgba(0,0,0,0.20)] border-4 border-gray-200 rounded-2xl">
           <div className="grid lg:grid-cols-2">
           <div className="w-full flex py-6 px-6">
             <div className="w-24 h-24 lg:w-36 lg:h-36 bg-NYCProfile bg-cover bg-center rounded-full overflow-hidden relative"></div>

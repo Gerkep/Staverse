@@ -76,7 +76,7 @@ export default function Event({ event }: InferGetServerSidePropsType<typeof getS
       return(
         <div key={stay.id}>
         {stay.data.eventName === event.name &&
-        <div  className="w-80 lg:ml-12 lg:mr-12 mb-16 lg:mb-0 lg:mt-28 rounded-xl relative">
+        <div  className="w-80 lg:ml-12 lg:mr-12 mb-16 rounded-xl relative">
           <div className="w-full h-80 rounded-md shadow-[1px_1px_25px_rgba(0,0,0,0.24)] hover:scale-105 transition ease-in duration-180 cursor-pointer overflow-hidden relative">
             {stay.data.image ? 
             <Link href={`/stays/${stay.id}`}><Image alt="stayImage" layout='fill' objectFit='cover'  src={stay.data.image}></Image></Link>
