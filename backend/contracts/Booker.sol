@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.9;
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
@@ -13,6 +13,7 @@ contract Booker is Ownable, ERC721, ERC721URIStorage{
 
     uint256 public fee;
     address ownerAddress;
+    bool isPaused;
     mapping(string => Stay) stays;
 
     struct Stay {
@@ -30,8 +31,9 @@ contract Booker is Ownable, ERC721, ERC721URIStorage{
         fee = 104;
         ownerAddress = msg.sender;
     }
-    
+
     function addStay(string calldata id, uint256 costPerPerson, uint8 spots, string calldata imageURL) public {
+        require(!isPaused, "smart contract isPausedd");
         Stay memory newStay = Stay({
             id: id,
             costPerPerson: costPerPerson,
@@ -44,6 +46,7 @@ contract Booker is Ownable, ERC721, ERC721URIStorage{
 
     function joinStay(IERC20 token, uint256 amount, string calldata stayId) public {
         Stay storage stayToJoin = stays[stayId];
+        require(!isPaused, "smart contract paused");
         require(amount <= token.balanceOf(msg.sender), "balance too low");
         require(amount == stayToJoin.costPerPerson*fee/100, "wrong amount of tokens");
         require(stayToJoin.spots > 0, "no spots left");
@@ -66,6 +69,9 @@ contract Booker is Ownable, ERC721, ERC721URIStorage{
     }
     function setFee(uint256 feePercentage) public onlyOwner {
         fee = feePercentage;
+    }
+    function setPause(bool pause) public onlyOwner {
+        isPaused = pause;
     }
     function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage)
         returns (string memory)
