@@ -27,7 +27,8 @@ module.exports = {
       'stay3': "url('../public/img/stay-3.png')",
       'dimmedBackground': "url('../public/img/background-dim-long.png')",
       'NYCProfile': "url('../public/img/NYC_profile.jpg')",
-      'guarantee': "url('../public/img/guarantee.png')"
+      'guarantee': "url('../public/img/guarantee.png')",
+      'USDC': "url('../public/img/USDC.png')",
     },
     spacing: {
       '32': '32rem',

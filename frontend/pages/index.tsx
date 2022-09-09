@@ -56,6 +56,7 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
   const [showCallendar, setShowCallendar] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(true);
+  const [displayGuaranteeInfo, setDisplayGuaranteeInfo ] = useState(false);
 
   const handleChange = (image: File) => {
     setImage(image);
@@ -107,15 +108,16 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
     <div onClick={() => setShowCallendar(false)}>
       <Loading />
       <Navbar style="dark" showNav={false}/>
-      <div className="lg:w-1/2 lg:h-full fixed mt-36 lg:mt-0 lg:pr-28 w-full flex lg:flex-wrap lg:items-center">
+      <div className="lg:w-1/2 lg:h-full fixed mt-28 lg:mt-0 lg:pr-28 w-full flex lg:flex-wrap lg:items-center">
         <div>
-            <h1 className="px-8 lg:px-0 text-5xl xl:text-7xl text-center lg:text-left lg:ml-8 font-black"><span className="text-indigo-600">Book a stay</span> for your next hack.</h1>
+            <h1 className="px-8 lg:px-0 mt-4 text-5xl xl:text-7xl text-center lg:text-left lg:ml-8 font-black"><span className="text-indigo-600">Book a stay</span> for your next hack.</h1>
             <div className="w-full flex justify-center lg:justify-start">
-              <div className="w-10/12 lg:w-5/6 h-44 bg-center lg:bg-left bg-guarantee bg-contain bg-no-repeat mt-12 lg:ml-8 lg:mt-12"></div>
+              <div onMouseOver={() => setDisplayGuaranteeInfo(true)} onMouseLeave={() => setDisplayGuaranteeInfo(false)} className="w-10/12 lg:w-5/6 h-44 bg-center cursor-pointer lg:bg-left bg-guarantee bg-contain bg-no-repeat mt-10 lg:ml-8 lg:mt-12"></div>
             </div>
+            {displayGuaranteeInfo ? <div className="absolute w-10/12 lg:w-4/6 z-40 ml-8 text-gray-400 py-4 px-8 lg:px-0 lg:py-0 lg:bg-white bg-subtle-gray rounded-xl">100% refund is granted only when the stay is no longer available or not enough money was raised to book it.</div> : ''}
             <div className="w-full lg:w-auto flex lg:block justify-center">
             <Link href="/events/avUJdtt1DBsbRb23kYWL"><button className="lg:border-4 border-black text-white lg:text-black shadow-[2px_2px_30px_rgba(0,0,0,0.25)] lg:shadow-[12px_12px_0_rgba(0,0,0,1)] font-bold rounded-xl bg-indigo-600 lg:bg-white
-            px-16 xl:px-20 py-6 text-xl lg:text-2xl lg:ml-8 mt-8 lg:mt-16 hover:scale-105 transition ease-in duration-240 hover:scale-105 lg:hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180">
+            px-16 xl:px-20 py-6 text-xl lg:text-2xl lg:ml-8 mt-6 lg:mt-16 hover:scale-105 transition ease-in duration-240 hover:scale-105 lg:hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180">
               Book for Bogota!
             </button></Link>
             </div>
@@ -348,7 +350,7 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
       <h2 className="text-4xl lg:text-5xl tracking-tight font-black lg:font-bold text-gray-900 sm:tracking-tight w-full">
            Behind the scenes
           </h2>
-        <div className="mt-12 w-11/12 lg:w-8/12 pb-12 bg-gray-100 shadow-[5px_5px_40px_rgba(0,0,0,0.20)] border-4 border-gray-200 rounded-2xl">
+        <div className="mt-12 w-11/12 lg:w-8/12 pb-12 shadow-[5px_5px_40px_rgba(0,0,0,0.20)] border-4 border-gray-200 rounded-2xl">
           <div className="grid lg:grid-cols-2">
           <div className="w-full flex py-6 px-6">
             <div className="w-24 h-24 lg:w-36 lg:h-36 bg-NYCProfile bg-cover bg-center rounded-full overflow-hidden relative"></div>
