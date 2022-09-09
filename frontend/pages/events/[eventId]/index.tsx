@@ -125,9 +125,9 @@ export default function Event({ event }: InferGetServerSidePropsType<typeof getS
               <p className="w-10/12 lg:w-auto ml-8 mt-4 text-gray-500">{event.description}</p>
             </div>
             <div className="flex justify-end w-full">
-              <IoLogoTwitter className="text-gray-900 h-8 w-8 mr-8 lg:mr-12 mt-8 ml-8 lg:ml-0 mb-6 lg:mt-0 cursor-pointer hover:text-indigo-600 transition ease-in duration-180"></IoLogoTwitter>
-              <IoLogoDiscord className="text-gray-900 h-8 w-8 mr-8 lg:mr-12 mt-8 mb-6 lg:mt-0 cursor-pointer hover:text-indigo-600 transition ease-in duration-180"></IoLogoDiscord>
-              <IoDesktop className="text-gray-900 h-8 w-8 mr-8 lg:mr-12 mt-8 mb-6 lg:mt-0 cursor-pointer hover:text-indigo-600 transition ease-in duration-180"></IoDesktop>
+              <Link href={event.twitter}><IoLogoTwitter className="text-gray-900 h-8 w-8 mr-8 lg:mr-12 mt-8 ml-8 lg:ml-0 mb-6 lg:mt-0 cursor-pointer hover:text-indigo-600 transition ease-in duration-180"></IoLogoTwitter></Link>
+              <Link href={event.discord}><IoLogoDiscord className="text-gray-900 h-8 w-8 mr-8 lg:mr-12 mt-8 mb-6 lg:mt-0 cursor-pointer hover:text-indigo-600 transition ease-in duration-180"></IoLogoDiscord></Link>
+              <Link href={event.websiteURL}><IoDesktop className="text-gray-900 h-8 w-8 mr-8 lg:mr-12 mt-8 mb-6 lg:mt-0 cursor-pointer hover:text-indigo-600 transition ease-in duration-180"></IoDesktop></Link>
             </div>
           </div>
         </div>
