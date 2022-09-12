@@ -24,11 +24,11 @@ export default function Profile() {
       let fetchedNfts: string[] = [];
       if (typeof address === "string"){
         const allNfts = await alchemy.nft.getNftsForOwner(address);
-        console.log(allNfts);
+        console.log(allNfts)
         allNfts.ownedNfts.map((nft) => {
           console.log(nft)
-          if(nft.contract.address === "0xb1339d62a1129c9ab146ada1ceb9760fea24a811" && nft.tokenUri){
-            fetchedNfts.push(nft.tokenUri.gateway);
+          if(nft.contract.address === "0xb1339d62a1129c9ab146ada1ceb9760fea24a811" && nft.media[0]){
+            fetchedNfts.push(nft.media[0].raw);
           }
         })
       }

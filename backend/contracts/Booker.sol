@@ -22,7 +22,7 @@ contract Booker is Ownable, ERC721, ERC721URIStorage{
         uint256 costPerPerson;
         uint256 fundsRaised;
         uint8 spots;
-        string imageURL;
+        string tokenURI;
         address[] housemates;
         uint[] nftsMinted;
     }
@@ -35,7 +35,7 @@ contract Booker is Ownable, ERC721, ERC721URIStorage{
         ownerAddress = msg.sender;
         USDCToken = IERC20(0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174);
     }
-    function addStay(string calldata stayId, uint256 tokensPerPerson, uint8 availableSpots, string calldata imageURL) external {
+    function addStay(string calldata stayId, uint256 tokensPerPerson, uint8 availableSpots, string calldata metadataURI) external {
         require(!isPaused, "smart contract paused");
         require(tokensPerPerson > 0, "wrong tokens per person");
         require(availableSpots > 0, "wrong amount of spots");
@@ -46,7 +46,7 @@ contract Booker is Ownable, ERC721, ERC721URIStorage{
             costPerPerson: tokensPerPerson,
             fundsRaised: 0,
             spots: availableSpots,
-            imageURL: imageURL,
+            tokenURI: metadataURI,
             housemates: arrayOfAddresses,
             nftsMinted: nftIds
         });
@@ -61,7 +61,7 @@ contract Booker is Ownable, ERC721, ERC721URIStorage{
         USDCToken.transferFrom(msg.sender, address(this), deposit);
         _tokenIds.increment();
         _mint(msg.sender, _tokenIds.current());
-        _setTokenURI(_tokenIds.current(), stay.imageURL);
+        _setTokenURI(_tokenIds.current(), stay.tokenURI);
         stay.spots--;
         stay.fundsRaised += deposit;
         stay.housemates.push(msg.sender);

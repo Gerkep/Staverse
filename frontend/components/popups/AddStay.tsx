@@ -30,9 +30,9 @@ type DateRange = {
   endDate: Date, 
   key: string
 }
-const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Dec"]
+const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
-export default function Signin(props: {onCloseModal: any, link: string, price: string, dates: DateRange, eventName: string, spots: string, image: string}){
+export default function Signin(props: {onCloseModal: any, link: string, price: string, dates: DateRange, eventName: string, spots: string, image: File}){
 
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
@@ -54,11 +54,19 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
       const contract = new ethers.Contract('0xb1339D62a1129c9aB146AdA1cEb9760feA24a811', Booker.abi, signer) as BookerType;
       const subdomain = 'https://staverse.infura-ipfs.io';
       const date = `${(props.dates.startDate).getDate()} ${months[(props.dates.startDate).getMonth()]}-${(props.dates.endDate).getDate()} ${months[(props.dates.endDate).getMonth()]}`
-      let URL = "";
+      let imageURL = "";
+      let nftURL = "";
       if(props.image){
         try {
-          const added = await client.add({ content: props.image });
-          URL = `${subdomain}/ipfs/${added.path}`;
+          const imageAdded = await client.add({ content: props.image });
+          imageURL = `${subdomain}/ipfs/${imageAdded.path}`;
+          const nftMetadata = {
+            image: imageURL,
+            name: props.eventName,
+            description: `Stay token for ${props.eventName}`,
+          }
+          const nftAdded = await client.add({ content: JSON.stringify(nftMetadata)});
+          nftURL = `${subdomain}/ipfs/${nftAdded.path}`;
         } catch (error) {
           console.log('Error uploading file to IPFS.');
         }
@@ -70,13 +78,13 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
         spots: props.spots,
         fullName: fullName,
         email: email,
-        image: URL,
+        image: imageURL,
         date: date
       }).then(async (docRef) => {
         setStayId(docRef.id);
         const costPerPerson = parseInt(props.price)/parseInt(props.spots)*1000000;
         try{
-          const addTx = await contract.addStay(docRef.id, costPerPerson, props.spots, URL);
+          const addTx = await contract.addStay(docRef.id, costPerPerson, props.spots, nftURL);
           await addTx.wait();
           setStep(2);
         }catch{
