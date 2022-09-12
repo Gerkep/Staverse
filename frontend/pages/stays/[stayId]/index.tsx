@@ -15,6 +15,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Loading from "../../../components/Loading";
 import { useRouter } from "next/router";
+import Feedback from "../../../components/popups/Feedback";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const stayId = context.params?.stayId
@@ -41,6 +42,8 @@ export default function Stay({ stay, stayId }: InferGetServerSidePropsType<typeo
   const [loading, setLoading] = useState(false);
   const [approved, setApproved] = useState(false);
   const [spots, setSpots] = useState(0);
+  const [ success, setSuccess ] = useState(false);
+  const [ failure, setFailure ] = useState(false);
   const [ hasJoined, setHasJoined ] = useState(false);
   const [copyMessage, setCopyMessage ] = useState(false);
   
@@ -76,9 +79,14 @@ const approveERC20 = async () => {
     await approveTx.wait();
     setApproved(true)
     setLoading(false);
+    setSuccess(true);
+    setTimeout(function(){
+      setSuccess(false);
+  }, 2500);
   }catch{
     console.log("Approval error");
     setLoading(false);
+    setFailure(true);
   }
 }
 const joinStay = async () => {
@@ -94,9 +102,17 @@ const joinStay = async () => {
       await deleteDoc(doc(db, "Stays", stayId));
     }
     setLoading(false);
+    setSuccess(true);
+    setTimeout(function(){
+      setSuccess(false);
+  }, 2500);
   }catch{
     console.log("Smart contract tx error");
     setLoading(false);
+    setFailure(true);
+    setTimeout(function(){
+      setFailure(false);
+  }, 2500);
   }
 }
 
@@ -111,6 +127,10 @@ const resign = async () => {
   }catch{
     console.log("Smart contract tx error");
     setLoading(false);
+    setFailure(true);
+    setTimeout(function(){
+      setFailure(false);
+  }, 2500);
   }
 }
 
@@ -126,6 +146,12 @@ const copyLink = () => {
     <>
       <Loading />
       <Navbar style="dark" showNav={true}/>
+      {success == true && 
+        <Feedback close={() => setSuccess(false)} type="success"/>
+        }
+      {failure == true && 
+        <Feedback close={() => setFailure(false)} type="false"/>
+        }
       <div className="w-full h-screen flex justify-center">
         <div className="w-11/12 lg:w-10/12 h-full lg:h-5/6 lg:grid lg:grid-cols-2 items-center pt-4 lg:pt-0 lg:pt-0 border-4 border-gray-200 mt-24 rounded-xl bg-gray-100 px-6 lg:px-12 justify-center">
             <a href={`${stay.link}`} className="w-full h-48 lg:h-5/6 hover:scale-105 hover:shadow-[5px_8px_30px_rgba(0,0,0,0.24)] rounded-xl transition ease-in duration-240">
