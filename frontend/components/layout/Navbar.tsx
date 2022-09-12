@@ -7,23 +7,20 @@ import { useRouter } from 'next/router'
 import { useState } from "react"
 import Create from "../popups/Create"
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import MobileMenu from "../popups/MobileMenu"
 import { HiX } from "react-icons/hi";
 
 const Navbar: React.FC<{style:string, showNav: boolean}> = ({style, showNav}) => {
   const router = useRouter()
   const [showCreationModal, setShowCreationModal] = useState(false);
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
     return (
       <>
       <div className="absolute top-0">
       {showCreationModal ? <Create onCloseModal={() => setShowCreationModal(false)}/> : '' }
-      {showMobileMenu ? <MobileMenu onCloseModal={() => setShowMobileMenu(false)}/> : ''}
       </div>
       <div className={showNav ? "fixed z-40 lg:z-40 top-0 w-full backdrop-blur flex items-center justify-end py-7 pb-20 lg:pb-6" : "fixed z-40 lg:z-20 top-0 w-full backdrop-blur lg:backdrop-blur-none flex justify-end py-7 pb-20 lg:pb-6"}>
       <Link href="/">
-        <div className="h-10 w-36 fixed top-2 lg:top-0 left-2 cursor-pointer hover:scale-105 transition ease-in duration-180">
+        <div className="h-10 w-36 inset-x-0 mx-auto lg:mx-2 fixed top-2 lg:top-0 left-2 cursor-pointer hover:scale-105 transition ease-in duration-180">
             {style === "light" ? 
             <Image
                 src={logo}
@@ -58,21 +55,6 @@ const Navbar: React.FC<{style:string, showNav: boolean}> = ({style, showNav}) =>
           <ConnectButton />
         </div>
       </div>
-      }
-      {showMobileMenu ?
-      <div className="w-full z-50 top-0 lg:hidden">
-        <div className="space-y-2 mr-6 mt-2 cursor-pointer absolute right-0" onClick={() => setShowMobileMenu(false)}>
-          <HiX className={style === "light" ? " text-white w-10 h-10" : "w-10 h-10"} />
-        </div>   
-      </div>   
-      :
-      <div className="w-full z-50 lg:hidden">
-        <div className="space-y-2 mr-6 mt-2 lg:hidden cursor-pointer absolute right-0" onClick={() => setShowMobileMenu(true)}>
-          <div className={style === "light" ? "w-10 h-1 bg-white rounded" : "w-10 h-1 bg-gray-900 rounded"}></div>
-          <div className={style === "light" ? "w-10 h-1 bg-white rounded" : "w-10 h-1 bg-gray-900 rounded"}></div>
-          <div className={style === "light" ? "w-10 h-1 bg-white rounded" : "w-10 h-1 bg-gray-900 rounded"}></div>
-        </div>   
-      </div>  
       }
       </div>
       </div>

@@ -28,13 +28,14 @@ contract Booker is Ownable, ERC721, ERC721URIStorage{
     }
 
     event BookStay(address user, string stayId, uint256 value);
-    event JoinStay(address user, uint256 value);
+    event JoinStay(address user, string stayId, uint256 value);
 
     constructor() ERC721("StayToken", "STY") {
-        fee = 104;
+        fee = 103;
         ownerAddress = msg.sender;
-        USDCToken = IERC20(0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174);
+        USDCToken = IERC20(0xDD9185DB084f5C4fFf3b4f70E7bA62123b812226);
     }
+
     function addStay(string calldata stayId, uint256 tokensPerPerson, uint8 availableSpots, string calldata metadataURI) external {
         require(!isPaused, "smart contract paused");
         require(tokensPerPerson > 0, "wrong tokens per person");
@@ -71,14 +72,14 @@ contract Booker is Ownable, ERC721, ERC721URIStorage{
             emit BookStay(msg.sender, stayId, stay.fundsRaised);
             delete stays[stayId];
         }else{
-            emit JoinStay(msg.sender, deposit);
+            emit JoinStay(msg.sender, stayId, deposit);
         }
     }
     function resign(string calldata stayId) external {
         Stay storage stay = stays[stayId];
         require(stay.spots > 0, "You can't resign now");
         uint256 refund = stay.costPerPerson*95/100;
-        for(uint i=0; i < stay.housemates.length; i++){
+        for(uint i = 0; i < stay.housemates.length; i++){
             if(stay.housemates[i] == msg.sender){
                 delete stay.housemates[i];
                 stay.spots++;
@@ -91,7 +92,7 @@ contract Booker is Ownable, ERC721, ERC721URIStorage{
                             _burn(stay.nftsMinted[j]);
                             delete stay.nftsMinted[j];
                             break;
-                            }
+                        }
                     }
                 }
                 break;
