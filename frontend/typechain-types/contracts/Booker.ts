@@ -34,6 +34,8 @@ export declare namespace Booker {
     fundsRaised: PromiseOrValue<BigNumberish>;
     spots: PromiseOrValue<BigNumberish>;
     imageURL: PromiseOrValue<string>;
+    housemates: PromiseOrValue<string>[];
+    nftsMinted: PromiseOrValue<BigNumberish>[];
   };
 
   export type StayStructOutput = [
@@ -41,13 +43,17 @@ export declare namespace Booker {
     BigNumber,
     BigNumber,
     number,
-    string
+    string,
+    string[],
+    BigNumber[]
   ] & {
     id: string;
     costPerPerson: BigNumber;
     fundsRaised: BigNumber;
     spots: number;
     imageURL: string;
+    housemates: string[];
+    nftsMinted: BigNumber[];
   };
 }
 
@@ -59,16 +65,19 @@ export interface BookerInterface extends utils.Interface {
     "fee()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "getStay(string)": FunctionFragment;
+    "getUserBookingId(address)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
-    "joinStay(address,uint256,string)": FunctionFragment;
+    "joinStay(uint256,string)": FunctionFragment;
     "name()": FunctionFragment;
     "owner()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
+    "resign(string)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256,bytes)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "setFee(uint256)": FunctionFragment;
+    "setPause(bool)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
@@ -84,16 +93,19 @@ export interface BookerInterface extends utils.Interface {
       | "fee"
       | "getApproved"
       | "getStay"
+      | "getUserBookingId"
       | "isApprovedForAll"
       | "joinStay"
       | "name"
       | "owner"
       | "ownerOf"
       | "renounceOwnership"
+      | "resign"
       | "safeTransferFrom(address,address,uint256)"
       | "safeTransferFrom(address,address,uint256,bytes)"
       | "setApprovalForAll"
       | "setFee"
+      | "setPause"
       | "supportsInterface"
       | "symbol"
       | "tokenURI"
@@ -128,16 +140,16 @@ export interface BookerInterface extends utils.Interface {
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
+    functionFragment: "getUserBookingId",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
     functionFragment: "isApprovedForAll",
     values: [PromiseOrValue<string>, PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
     functionFragment: "joinStay",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<string>
-    ]
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<string>]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
@@ -148,6 +160,10 @@ export interface BookerInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "resign",
+    values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
     functionFragment: "safeTransferFrom(address,address,uint256)",
@@ -173,6 +189,10 @@ export interface BookerInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "setFee",
     values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setPause",
+    values: [PromiseOrValue<boolean>]
   ): string;
   encodeFunctionData(
     functionFragment: "supportsInterface",
@@ -206,6 +226,10 @@ export interface BookerInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "getStay", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "getUserBookingId",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "isApprovedForAll",
     data: BytesLike
   ): Result;
@@ -217,6 +241,7 @@ export interface BookerInterface extends utils.Interface {
     functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "resign", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "safeTransferFrom(address,address,uint256)",
     data: BytesLike
@@ -230,6 +255,7 @@ export interface BookerInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setFee", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "setPause", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
     data: BytesLike
@@ -361,9 +387,9 @@ export interface Booker extends BaseContract {
 
   functions: {
     addStay(
-      id: PromiseOrValue<string>,
-      costPerPerson: PromiseOrValue<BigNumberish>,
-      spots: PromiseOrValue<BigNumberish>,
+      stayId: PromiseOrValue<string>,
+      tokensPerPerson: PromiseOrValue<BigNumberish>,
+      availableSpots: PromiseOrValue<BigNumberish>,
       imageURL: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
@@ -391,6 +417,11 @@ export interface Booker extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[Booker.StayStructOutput]>;
 
+    getUserBookingId(
+      userAddress: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     isApprovedForAll(
       owner: PromiseOrValue<string>,
       operator: PromiseOrValue<string>,
@@ -398,8 +429,7 @@ export interface Booker extends BaseContract {
     ): Promise<[boolean]>;
 
     joinStay(
-      token: PromiseOrValue<string>,
-      amount: PromiseOrValue<BigNumberish>,
+      deposit: PromiseOrValue<BigNumberish>,
       stayId: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
@@ -414,6 +444,11 @@ export interface Booker extends BaseContract {
     ): Promise<[string]>;
 
     renounceOwnership(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    resign(
+      stayId: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -440,6 +475,11 @@ export interface Booker extends BaseContract {
 
     setFee(
       feePercentage: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    setPause(
+      pause: PromiseOrValue<boolean>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -469,9 +509,9 @@ export interface Booker extends BaseContract {
   };
 
   addStay(
-    id: PromiseOrValue<string>,
-    costPerPerson: PromiseOrValue<BigNumberish>,
-    spots: PromiseOrValue<BigNumberish>,
+    stayId: PromiseOrValue<string>,
+    tokensPerPerson: PromiseOrValue<BigNumberish>,
+    availableSpots: PromiseOrValue<BigNumberish>,
     imageURL: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
@@ -499,6 +539,11 @@ export interface Booker extends BaseContract {
     overrides?: CallOverrides
   ): Promise<Booker.StayStructOutput>;
 
+  getUserBookingId(
+    userAddress: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   isApprovedForAll(
     owner: PromiseOrValue<string>,
     operator: PromiseOrValue<string>,
@@ -506,8 +551,7 @@ export interface Booker extends BaseContract {
   ): Promise<boolean>;
 
   joinStay(
-    token: PromiseOrValue<string>,
-    amount: PromiseOrValue<BigNumberish>,
+    deposit: PromiseOrValue<BigNumberish>,
     stayId: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
@@ -522,6 +566,11 @@ export interface Booker extends BaseContract {
   ): Promise<string>;
 
   renounceOwnership(
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  resign(
+    stayId: PromiseOrValue<string>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -551,6 +600,11 @@ export interface Booker extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  setPause(
+    pause: PromiseOrValue<boolean>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   supportsInterface(
     interfaceId: PromiseOrValue<BytesLike>,
     overrides?: CallOverrides
@@ -577,9 +631,9 @@ export interface Booker extends BaseContract {
 
   callStatic: {
     addStay(
-      id: PromiseOrValue<string>,
-      costPerPerson: PromiseOrValue<BigNumberish>,
-      spots: PromiseOrValue<BigNumberish>,
+      stayId: PromiseOrValue<string>,
+      tokensPerPerson: PromiseOrValue<BigNumberish>,
+      availableSpots: PromiseOrValue<BigNumberish>,
       imageURL: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -607,6 +661,11 @@ export interface Booker extends BaseContract {
       overrides?: CallOverrides
     ): Promise<Booker.StayStructOutput>;
 
+    getUserBookingId(
+      userAddress: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     isApprovedForAll(
       owner: PromiseOrValue<string>,
       operator: PromiseOrValue<string>,
@@ -614,8 +673,7 @@ export interface Booker extends BaseContract {
     ): Promise<boolean>;
 
     joinStay(
-      token: PromiseOrValue<string>,
-      amount: PromiseOrValue<BigNumberish>,
+      deposit: PromiseOrValue<BigNumberish>,
       stayId: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -630,6 +688,11 @@ export interface Booker extends BaseContract {
     ): Promise<string>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
+
+    resign(
+      stayId: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     "safeTransferFrom(address,address,uint256)"(
       from: PromiseOrValue<string>,
@@ -654,6 +717,11 @@ export interface Booker extends BaseContract {
 
     setFee(
       feePercentage: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setPause(
+      pause: PromiseOrValue<boolean>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -738,9 +806,9 @@ export interface Booker extends BaseContract {
 
   estimateGas: {
     addStay(
-      id: PromiseOrValue<string>,
-      costPerPerson: PromiseOrValue<BigNumberish>,
-      spots: PromiseOrValue<BigNumberish>,
+      stayId: PromiseOrValue<string>,
+      tokensPerPerson: PromiseOrValue<BigNumberish>,
+      availableSpots: PromiseOrValue<BigNumberish>,
       imageURL: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
@@ -768,6 +836,11 @@ export interface Booker extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getUserBookingId(
+      userAddress: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     isApprovedForAll(
       owner: PromiseOrValue<string>,
       operator: PromiseOrValue<string>,
@@ -775,8 +848,7 @@ export interface Booker extends BaseContract {
     ): Promise<BigNumber>;
 
     joinStay(
-      token: PromiseOrValue<string>,
-      amount: PromiseOrValue<BigNumberish>,
+      deposit: PromiseOrValue<BigNumberish>,
       stayId: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
@@ -791,6 +863,11 @@ export interface Booker extends BaseContract {
     ): Promise<BigNumber>;
 
     renounceOwnership(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    resign(
+      stayId: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -817,6 +894,11 @@ export interface Booker extends BaseContract {
 
     setFee(
       feePercentage: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    setPause(
+      pause: PromiseOrValue<boolean>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -847,9 +929,9 @@ export interface Booker extends BaseContract {
 
   populateTransaction: {
     addStay(
-      id: PromiseOrValue<string>,
-      costPerPerson: PromiseOrValue<BigNumberish>,
-      spots: PromiseOrValue<BigNumberish>,
+      stayId: PromiseOrValue<string>,
+      tokensPerPerson: PromiseOrValue<BigNumberish>,
+      availableSpots: PromiseOrValue<BigNumberish>,
       imageURL: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
@@ -877,6 +959,11 @@ export interface Booker extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    getUserBookingId(
+      userAddress: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     isApprovedForAll(
       owner: PromiseOrValue<string>,
       operator: PromiseOrValue<string>,
@@ -884,8 +971,7 @@ export interface Booker extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     joinStay(
-      token: PromiseOrValue<string>,
-      amount: PromiseOrValue<BigNumberish>,
+      deposit: PromiseOrValue<BigNumberish>,
       stayId: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
@@ -900,6 +986,11 @@ export interface Booker extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     renounceOwnership(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    resign(
+      stayId: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -926,6 +1017,11 @@ export interface Booker extends BaseContract {
 
     setFee(
       feePercentage: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setPause(
+      pause: PromiseOrValue<boolean>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

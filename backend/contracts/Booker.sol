@@ -33,9 +33,8 @@ contract Booker is Ownable, ERC721, ERC721URIStorage{
     constructor() ERC721("StayToken", "STY") {
         fee = 104;
         ownerAddress = msg.sender;
-        USDCToken = IERC20(0x87284d4150b0FADe12255A7d208AD46526C519ee);
+        USDCToken = IERC20(0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174);
     }
-
     function addStay(string calldata stayId, uint256 tokensPerPerson, uint8 availableSpots, string calldata imageURL) external {
         require(!isPaused, "smart contract paused");
         require(tokensPerPerson > 0, "wrong tokens per person");
@@ -53,7 +52,6 @@ contract Booker is Ownable, ERC721, ERC721URIStorage{
         });
         stays[newStay.id] = newStay;
     }
-
     function joinStay(uint256 deposit, string calldata stayId) external  {
         Stay storage stay = stays[stayId];
         require(!isPaused, "smart contract paused");
@@ -76,7 +74,6 @@ contract Booker is Ownable, ERC721, ERC721URIStorage{
             emit JoinStay(msg.sender, deposit);
         }
     }
-
     function resign(string calldata stayId) external {
         Stay storage stay = stays[stayId];
         require(stay.spots > 0, "You can't resign now");
@@ -101,7 +98,7 @@ contract Booker is Ownable, ERC721, ERC721URIStorage{
             }
         }
     }
-    function getStay(string calldata id) external view returns(Stay memory){
+    function getStay(string calldata id) external view returns(Stay memory) {
         return stays[id];
     }
     function setFee(uint256 feePercentage) public onlyOwner {

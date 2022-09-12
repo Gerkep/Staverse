@@ -8,8 +8,8 @@ import Image from "next/image";
 import { HiOutlinePhotograph } from "react-icons/hi";
 
 const config = {
-  apiKey: "UqL-g9DI5zMqq-ijYZleberB2DY81VK6",
-  network: Network.ETH_GOERLI,
+  apiKey: "_JUTNUYNbI-Id22QGe8QFZrAmc8I4d0T",
+  network: Network.MATIC_MUMBAI,
 };
 
 export default function Profile() {
@@ -24,9 +24,10 @@ export default function Profile() {
       let fetchedNfts: string[] = [];
       if (typeof address === "string"){
         const allNfts = await alchemy.nft.getNftsForOwner(address);
+        console.log(allNfts);
         allNfts.ownedNfts.map((nft) => {
           console.log(nft)
-          if(nft.contract.address === "0xc44a1a274f81da3651568ad43c19109f834b88ea" && nft.tokenUri){
+          if(nft.contract.address === "0xb1339d62a1129c9ab146ada1ceb9760fea24a811" && nft.tokenUri){
             fetchedNfts.push(nft.tokenUri.gateway);
           }
         })

@@ -58,7 +58,7 @@ export default function Event({ event }: InferGetServerSidePropsType<typeof getS
     setLoading(true);
     const getStays = async () => {
       const provider = ethers.getDefaultProvider('goerli')
-      const contract = new ethers.Contract('0xc44a1A274F81dA3651568aD43C19109f834B88Ea', Booker.abi, provider) as BookerType;
+      const contract = new ethers.Contract('0xb1339D62a1129c9aB146AdA1cEb9760feA24a811', Booker.abi, provider) as BookerType;
       const querySnapshot = await getDocs(query(collection(db, "Stays")));
       const stays: Stay[] = [];
       querySnapshot.forEach((doc) => {

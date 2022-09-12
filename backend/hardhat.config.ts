@@ -7,7 +7,7 @@ import * as dotenv from 'dotenv'
 dotenv.config()
 
 const config: HardhatUserConfig = {
-  // defaultNetwork: "goerli",
+  defaultNetwork: "mumbai",
   solidity: "0.8.17",
   networks: {
     hardhat: {

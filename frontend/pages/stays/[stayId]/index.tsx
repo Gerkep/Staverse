@@ -2,10 +2,10 @@ import Navbar from "../../../components/layout/Navbar";
 import {  ExternalLinkIcon } from '@chakra-ui/icons'
 import Footer from "../../../components/layout/Footer";
 import { useEffect, useState } from "react";
-import { useSigner } from 'wagmi'
+import { useAccount, useSigner } from 'wagmi'
 import { ethers } from 'ethers'
 import Booker from '../../../artifacts/contracts/Booker.sol/Booker.json';
-import USDCContract from '../../../artifacts/contracts/USDCGoerli/USDCGoerli.json';
+import {USDCabi} from '../../../artifacts/contracts/USDC/USDC';
 import { Booker as BookerType } from '../../../typechain-types';
 import { doc, getDoc, deleteDoc } from "firebase/firestore";
 import { db } from "../../../firebase/clientApp";
@@ -41,18 +41,28 @@ export default function Stay({ stay, stayId }: InferGetServerSidePropsType<typeo
   const [loading, setLoading] = useState(false);
   const [approved, setApproved] = useState(false);
   const [spots, setSpots] = useState(0);
-  const [ hasJoined, setHasJoined ] = useState(true);
+  const [ hasJoined, setHasJoined ] = useState(false);
   const [copyMessage, setCopyMessage ] = useState(false);
   
   const { data: signer } = useSigner();
+  const { address } = useAccount();
   const { asPath } = useRouter();
+  const router = useRouter();
 
   useEffect(() => {
     const getSpots = async () => {
-      const provider = ethers.getDefaultProvider('goerli')
-      const contract = new ethers.Contract('0xc44a1A274F81dA3651568aD43C19109f834B88Ea', Booker.abi, provider) as BookerType;
-      const stayStruct = await contract.getStay(stayId);
-      setSpots(stayStruct[3]);
+      if(signer){
+        const contract = new ethers.Contract('0xb1339D62a1129c9aB146AdA1cEb9760feA24a811', Booker.abi, signer) as BookerType;
+        const stayStruct = await contract.getStay(stayId);
+        const userBookingId = await contract.getStay(stayId);
+        const housemantes = stayStruct[5];
+        for (let i = 0; i < housemantes.length; i++){
+          if(housemantes[i] === address){
+            setHasJoined(true);
+          }
+        }
+        setSpots(stayStruct[3]);
+      }
     }
     getSpots();
   })
@@ -60,9 +70,9 @@ const approveERC20 = async () => {
   setLoading(true);
   if(!signer) return;
   const costPerPerson = parseInt(stay.price)/parseInt(stay.spots);
-  const contract = new ethers.Contract('0x88e8676363E1d4635a816d294634905AF292135A', USDCContract.abi, signer);
+  const contract = new ethers.Contract('0xe11A86849d99F524cAC3E7A0Ec1241828e332C62', USDCabi, signer);
   try {
-    const approveTx = await contract.approve('0xc44a1A274F81dA3651568aD43C19109f834B88Ea', costPerPerson*1040000);
+    const approveTx = await contract.approve('0xb1339D62a1129c9aB146AdA1cEb9760feA24a811', costPerPerson*1040000);
     await approveTx.wait();
     setApproved(true)
     setLoading(false);
@@ -74,10 +84,10 @@ const approveERC20 = async () => {
 const joinStay = async () => {
   setLoading(true);
   if(!signer) return;
-  const contract = new ethers.Contract('0xc44a1A274F81dA3651568aD43C19109f834B88Ea', Booker.abi, signer) as BookerType;
+  const contract = new ethers.Contract('0xb1339D62a1129c9aB146AdA1cEb9760feA24a811', Booker.abi, signer) as BookerType;
   try{
     const costPerPerson = parseInt(stay.price)/parseInt(stay.spots);
-    const joinTx = await contract.joinStay('0x88e8676363E1d4635a816d294634905AF292135A', costPerPerson*1040000, stayId);
+    const joinTx = await contract.joinStay(costPerPerson*1040000, stayId);
     await joinTx.wait();
     const stayStruct = await contract.getStay(stayId);
     if(stayStruct[3] === 0){
@@ -89,6 +99,21 @@ const joinStay = async () => {
     setLoading(false);
   }
 }
+
+const resign = async () => {
+  setLoading(true);
+  if(!signer) return;
+  const contract = new ethers.Contract('0xb1339D62a1129c9aB146AdA1cEb9760feA24a811', Booker.abi, signer) as BookerType;
+  try {
+    const resignTx = await contract.resign(stayId);
+    await resignTx.wait();
+    router.reload();
+  }catch{
+    console.log("Smart contract tx error");
+    setLoading(false);
+  }
+}
+
 const copyLink = () => {
   navigator.clipboard.writeText("https://hackerhouse.app" + asPath);
   setCopyMessage(true);
@@ -150,7 +175,7 @@ const copyLink = () => {
                 </div>
                 {hasJoined ? 
                 <div className="flex flex-wrap justify-center w-full mt-16">
-                    <button className="w-11/12 bg-red-400 py-4 flex justify-center rounded-xl font-bold text-white cursor-pointer">
+                    <button onClick={() => resign()} className="w-11/12 bg-red-400 py-4 flex justify-center rounded-xl font-bold text-white cursor-pointer">
                       {loading ? 
                       <div className='spinner-white'></div>
                       :

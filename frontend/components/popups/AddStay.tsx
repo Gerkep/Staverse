@@ -51,7 +51,7 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
       setLoading(true);
       e.preventDefault();
       if(!signer) return;
-      const contract = new ethers.Contract('0xc44a1A274F81dA3651568aD43C19109f834B88Ea', Booker.abi, signer) as BookerType;
+      const contract = new ethers.Contract('0xb1339D62a1129c9aB146AdA1cEb9760feA24a811', Booker.abi, signer) as BookerType;
       const subdomain = 'https://staverse.infura-ipfs.io';
       const date = `${(props.dates.startDate).getDate()} ${months[(props.dates.startDate).getMonth()]}-${(props.dates.endDate).getDate()} ${months[(props.dates.endDate).getMonth()]}`
       let URL = "";
@@ -76,7 +76,7 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
         setStayId(docRef.id);
         const costPerPerson = parseInt(props.price)/parseInt(props.spots)*1000000;
         try{
-          const addTx = await contract.addStay(docRef.id, costPerPerson, props.spots,URL);
+          const addTx = await contract.addStay(docRef.id, costPerPerson, props.spots, URL);
           await addTx.wait();
           setStep(2);
         }catch{
