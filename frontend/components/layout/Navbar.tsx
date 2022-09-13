@@ -3,20 +3,18 @@ import Image from 'next/image'
 import logo from '../../public/img/HH-logo-white.png'
 import blackLogo from '../../public/img/HH-logo-black.png'
 import {  AddIcon } from '@chakra-ui/icons'
-import { useRouter } from 'next/router'
 import { useState } from "react"
-import Create from "../popups/Create"
+import CreateStay from "../popups/CreateStay"
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { HiX } from "react-icons/hi";
 
 const Navbar: React.FC<{style:string, showNav: boolean}> = ({style, showNav}) => {
-  const router = useRouter()
   const [showCreationModal, setShowCreationModal] = useState(false);
 
     return (
       <>
       <div className="absolute top-0">
-      {showCreationModal ? <Create onCloseModal={() => setShowCreationModal(false)}/> : '' }
+      {showCreationModal ? <CreateStay onCloseModal={() => setShowCreationModal(false)} /> : '' }
       </div>
       <div className={showNav ? "fixed z-40 lg:z-40 top-0 w-full backdrop-blur flex items-center justify-end py-7 pb-20 lg:pb-6" : "fixed z-40 lg:z-20 top-0 w-full backdrop-blur lg:backdrop-blur-none flex justify-end py-7 pb-20 lg:pb-6"}>
       <Link href="/">

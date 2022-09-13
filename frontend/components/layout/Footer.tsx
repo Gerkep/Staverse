@@ -2,7 +2,7 @@ import Link from "next/link"
 import Image from 'next/image'
 import logo from '../../public/img/hh-house-black.png'
 
-const navigation = [{name: "Privacy policy", href: "#"}, {name: "Twitter", href: "#"}, {name: "Contact us", href: "#"}]
+const navigation = [{name: "Privacy policy", href: "#"}, {name: "Twitter", href: "https://twitter.com/hhouse_eth"}, {name: "Contact us", href: "https://twitter.com/hhouse_eth"}]
 
 export default function Navbar() {
     return (
@@ -11,7 +11,7 @@ export default function Navbar() {
         <nav className="-mx-5 -my-2 flex flex-wrap justify-center" aria-label="Footer">
         <div className="w-full h-24 flex justify-center ">
           <Link href="/" >
-            <div className="h-24 w-14 mt-0 ml-4 z-10 cursor-pointer hover:scale-105 transition ease-in duration-180">
+            <div className="h-24 w-14 mt-0 z-10 cursor-pointer hover:scale-105 transition ease-in duration-180">
                         <Image
                             src={logo}
                             alt="logo"

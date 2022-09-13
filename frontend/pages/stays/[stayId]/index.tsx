@@ -16,6 +16,7 @@ import Image from "next/image";
 import Loading from "../../../components/Loading";
 import { useRouter } from "next/router";
 import Feedback from "../../../components/popups/Feedback";
+import UserDetails from "../../../components/popups/UserDetails";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const stayId = context.params?.stayId
@@ -46,6 +47,7 @@ export default function Stay({ stay, stayId }: InferGetServerSidePropsType<typeo
   const [ failure, setFailure ] = useState(false);
   const [ hasJoined, setHasJoined ] = useState(false);
   const [copyMessage, setCopyMessage ] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   
   const { data: signer } = useSigner();
   const { address } = useAccount();
@@ -90,30 +92,7 @@ const approveERC20 = async () => {
   }
 }
 const joinStay = async () => {
-  setLoading(true);
-  if(!signer) return;
-  const contract = new ethers.Contract('0xb1339D62a1129c9aB146AdA1cEb9760feA24a811', Booker.abi, signer) as BookerType;
-  try{
-    const costPerPerson = parseInt(stay.price)/parseInt(stay.spots);
-    const joinTx = await contract.joinStay(costPerPerson*1040000, stayId);
-    await joinTx.wait();
-    const stayStruct = await contract.getStay(stayId);
-    if(stayStruct[3] === 0){
-      await deleteDoc(doc(db, "Stays", stayId));
-    }
-    setLoading(false);
-    setSuccess(true);
-    setTimeout(function(){
-      setSuccess(false);
-  }, 2500);
-  }catch{
-    console.log("Smart contract tx error");
-    setLoading(false);
-    setFailure(true);
-    setTimeout(function(){
-      setFailure(false);
-  }, 2500);
-  }
+  setShowModal(true);
 }
 
 const resign = async () => {
@@ -151,7 +130,8 @@ const copyLink = () => {
         }
       {failure == true && 
         <Feedback close={() => setFailure(false)} type="false"/>
-        }
+      }
+      {showModal ? <UserDetails onCloseModal={() => setShowModal(false)} link={stay.link} price={stay.price} dates={stay.date} eventName={stay.eventName} spots={stay.spots} image={stay.image} createNew={false} stayId={stayId}/> : '' }
       <div className="w-full h-full lg:h-screen flex justify-center">
         <div className="w-11/12 lg:w-10/12 h-full lg:h-5/6 lg:grid lg:grid-cols-2 items-center pt-4 lg:pt-0 lg:pt-0 border-4 border-gray-200 mt-36 lg:mt-24 rounded-xl bg-gray-100 px-6 lg:px-12 justify-center">
             <a href={`${stay.link}`} className="w-full h-48 lg:h-5/6 hover:scale-105 hover:shadow-[5px_8px_30px_rgba(0,0,0,0.24)] rounded-xl transition ease-in duration-240">
@@ -166,7 +146,7 @@ const copyLink = () => {
             <div className="w-full lg:h-5/6 flex justify-end">
             <div className="w-full lg:w-5/6 lg:h-full border-t-4 border-gray-200 rounded-sm lg:border-4 mt-8 lg:mt-0 pb-8 pt-4 lg-pt-0 lg:pb-0 lg:border-black lg:rounded-xl lg:shadow-[12px_15px_0_rgba(0,0,0,1)]">
                 <div className="w-full grid grid-cols-2">
-                  <h2 className="text-2xl lg:text-4xl font-black ml-4">{stay.eventName}</h2>
+                  <h2 className="text-2xl lg:text-3xl font-black ml-4">{stay.eventName}</h2>
                   <div className="w-full flex justify-end">
                       <HiOutlineDuplicate onClick={() => copyLink()} className="w-10 h-10 mr-4 hover:scale-110 cursor-pointer transition ease-in duration-180"/>
                       {copyMessage ? <div className="absolute mt-10 mr-4 py-2 px-4 bg-subtle-gray rounded-md">Link copied!</div> : ''}

@@ -1,7 +1,7 @@
 import { IoLogoTwitter, IoLogoDiscord, IoDesktop } from "react-icons/io5";
 import { useEffect, useState } from "react";
 import Navbar from "../../../components/layout/Navbar";
-import Create from "../../../components/popups/Create";
+import Create from "../../../components/popups/CreateStay";
 import Booker from '../../../artifacts/contracts/Booker.sol/Booker.json';
 import { Booker as BookerType } from '../../../typechain-types';
 import { ethers } from 'ethers'

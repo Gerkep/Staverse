@@ -4,44 +4,28 @@ import { Booker as BookerType } from '../../typechain-types';
 import { ethers } from 'ethers'
 import { useSigner } from 'wagmi'
 import { CloseIcon } from '@chakra-ui/icons';
-import { doc, collection, addDoc} from "firebase/firestore"; 
+import { doc, collection, addDoc, deleteDoc, updateDoc, arrayUnion, getDoc, DocumentData} from "firebase/firestore"; 
 import { db } from "../../firebase/clientApp";
 import Link from 'next/link';
 import { HiOutlinePhotograph, HiOutlineCheckCircle } from 'react-icons/hi';
-import { create, CID, IPFSHTTPClient } from "ipfs-http-client";
 import { useAccount, useNetwork, useSendTransaction } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { send } from "@emailjs/browser";
+import { useRouter } from 'next/router';
+import Feedback from './Feedback';
 
-const fileTypes = ["JPG", "PNG"];
-const projectId = process.env.NEXT_PUBLIC_IPFS_PROJECT_ID;
-const projectSecret = process.env.NEXT_PUBLIC_IPFS_API_KEY;
-const auth = `Basic ${Buffer.from(`${projectId}:${projectSecret}`).toString('base64')}`;
-const client = create({
-  host: 'ipfs.infura.io',
-  port: 5001,
-  protocol: 'https',
-  headers: {
-    authorization: auth,
-  },
-});
- 
-type DateRange = {
-  startDate: Date, 
-  endDate: Date, 
-  key: string
-}
-const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-
-export default function Signin(props: {onCloseModal: any, link: string, price: string, dates: DateRange, eventName: string, spots: string, image: File}){
+export default function Signin(props: {onCloseModal: any, link: string, price: string, dates: string, eventName: string, spots: string, image: File, createNew: boolean, stayId: string}){
 
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [step, setStep] = useState(1);
   const [stayId, setStayId] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [ failure, setFailure ] = useState(false);
 
   const { address, isConnected: isWagmiConnected } = useAccount();
   const { data: signer } = useSigner();
+  const router = useRouter()
 
     const handleCloseClick = () => {
         props.onCloseModal();
@@ -52,55 +36,84 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
       e.preventDefault();
       if(!signer) return;
       const contract = new ethers.Contract('0xb1339D62a1129c9aB146AdA1cEb9760feA24a811', Booker.abi, signer) as BookerType;
-      const subdomain = 'https://staverse.infura-ipfs.io';
-      const date = `${(props.dates.startDate).getDate()} ${months[(props.dates.startDate).getMonth()]}-${(props.dates.endDate).getDate()} ${months[(props.dates.endDate).getMonth()]}`
-      let imageURL = "";
-      let nftURL = "";
-      if(props.image){
-        try {
-          const imageAdded = await client.add({ content: props.image });
-          imageURL = `${subdomain}/ipfs/${imageAdded.path}`;
-          const nftMetadata = {
-            image: imageURL,
-            name: props.eventName,
-            description: `Stay token for ${props.eventName}`,
-          }
-          const nftAdded = await client.add({ content: JSON.stringify(nftMetadata)});
-          nftURL = `${subdomain}/ipfs/${nftAdded.path}`;
-        } catch (error) {
-          console.log('Error uploading file to IPFS.');
-        }
-      }
-      await addDoc(collection(db, "Stays"), {
-        link: props.link,
-        price: props.price,
-        eventName: props.eventName,
-        spots: props.spots,
-        fullName: fullName,
-        email: email,
-        image: imageURL,
-        date: date
-      }).then(async (docRef) => {
-        setStayId(docRef.id);
-        const costPerPerson = parseInt(props.price)/parseInt(props.spots)*1000000;
-        try{
-          const addTx = await contract.addStay(docRef.id, costPerPerson, props.spots, nftURL);
-          await addTx.wait();
-          setStep(2);
-        }catch{
-          console.log("Smart contract tx error");
-        }
-        setLoading(false);
-      });
+          await updateDoc(doc(db, "Stays", props.stayId), {
+            fullNames: arrayUnion(fullName),
+            emails: arrayUnion(email),
+          }).then(async () => {
+            try{
+              const costPerPerson = parseInt(props.price)/parseInt(props.spots);
+              const joinTx = await contract.joinStay(costPerPerson*1040000, props.stayId);
+              await joinTx.wait();
+              const stayStruct = await contract.getStay(props.stayId);
+
+              if(stayStruct[3] === 0){
+              let fetchedStay = {} as DocumentData;
+              if(typeof props.stayId == "string"){
+                const docSnap = await getDoc(doc(db, "Stays", props.stayId));
+                if (docSnap.exists()) {
+                  fetchedStay = docSnap.data();
+                } else {
+                  console.log("No such document!");
+                }
+              }
+              console.log((fetchedStay.emails), props.stayId, props.link, parseInt(props.price)*parseInt(props.spots), props.dates)
+              const total = parseInt(props.price)*parseInt(props.spots)
+              const templateParams = {
+                stayId: `${props.stayId}`,
+                emails: `${fetchedStay.emails}`,
+                names: `${fetchedStay.fullNames}`,
+                link: `${props.link}`,
+                totalPrice: `${total}`,
+                dates: `${props.dates}`
+              };
+              send('service_8wes2jm', 'template_7dw9y3i', templateParams, process.env.NEXT_PUBLIC_EMAILJS_USER_KEY)
+                .then(function(response) {
+                    console.log('SUCCESS!', response.status);
+                    for(let i = 0; i < fetchedStay.emails.length; i++){
+                      const templateUserParams = {
+                        eventName: `${props.eventName}`,
+                        email: `${fetchedStay.emails[i]}`,
+                        link: `${props.link}`
+                      };
+                      send("service_8wes2jm","template_aj717a7", templateUserParams, process.env.NEXT_PUBLIC_EMAILJS_USER_KEY)
+                      .then(function(response) {
+                          console.log('SUCCESS!', response.status, response.text);
+                      }, function(error) {
+                          console.log('FAILED...', error);
+                      });  
+                    }
+                }, function(error) {
+                    console.log('FAILED...', error);
+                });  
+                await deleteDoc(doc(db, "Stays", props.stayId));
+              }
+              setLoading(false);
+              setStep(2);
+            }catch{
+              console.log("Smart contract tx error");
+              setLoading(false);
+              setFailure(true);
+              setTimeout(function(){
+                setFailure(false);
+            }, 2500);
+            }
+          })
+    }
+    const backToHome = () => {
+      props.onCloseModal();
+      router.push('/');
     }
 
     const stepOne = () => {
       return (
         <div className="sm:mx-auto sm:w-full sm:max-w-md rounded-xl border-4 border-black shadow-[20px_20px_0_rgba(0,0,0,1)] cursor-auto">
+        {failure == true && 
+          <Feedback close={() => setFailure(false)} type="false"/>
+        }
         <div className="bg-white py-8 pb-16 px-4 shadow sm:rounded-lg sm:px-10 cursor-auto v" onClick={(e) => e.stopPropagation()}>
-          <h1 className=' text-center font-bold text-3xl'>Who is booking?</h1>
+          <h1 className=' text-center font-bold text-3xl'>Who is joining?</h1>
           <div className='flex pb-8 w-full justify-center'>
-                  <p className='text-center mt-8 text-gray-500'>Note: We need your email to add you to bookings and send details on your reservations.</p>
+                  <p className='text-center mt-8 text-gray-500'>Note: We need your email to add you to bookings and send details about your reservations.</p>
               </div>
           <form className="space-y-6" onSubmit={(e) => addStay(e)} method="POST">
             <div>
@@ -158,8 +171,13 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
                 {loading ? 
                 <div className='spinner-white'></div>
                 :
+                props.createNew ? 
                 <p>
                   Add Stay
+                </p>
+                :
+                <p>
+                  Join Stay
                 </p>
                 }
               </button>
@@ -184,15 +202,14 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
           </div>
           <h1 className=' text-center font-bold text-3xl mt-8'>Success!</h1>
           <div className='flex pb-8 w-full justify-center'>
-                  <p className='text-center mt-4 text-gray-500'>Your stay offer was successfully added to our platform! You can now share it with your frens!</p>
+              <p className='text-center mt-4 text-gray-500'>You successfully joined this stay! Once all funds are raised we will drop you an email and book it.</p>            
           </div>
-          <Link href={`/stays/${stayId}`}>
             <button
+            onClick={() => backToHome()}
               className="w-full flex justify-center py-4 px-4 border mt-8 border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black"
             >
-              View my offer
-            </button>
-          </Link>
+              Go to homepage
+            </button>        
         </div>
         </div>
       )

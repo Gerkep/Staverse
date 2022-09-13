@@ -7,13 +7,20 @@ import { FileUploader } from 'react-drag-drop-files';
 import { HiOutlinePhotograph, HiOutlineCheckCircle } from 'react-icons/hi';
 import { create, CID, IPFSHTTPClient } from "ipfs-http-client";
 import Link from 'next/link';
-import AddStay from "./AddStay";
+import UserDetails from "./UserDetails";
 import 'react-date-range/dist/styles.css'; 
 import 'react-date-range/dist/theme/default.css';
 import { DateRange } from 'react-date-range';
 import Dropdown from '../layout/Dropdown';
+import { ethers } from 'ethers';
+import { useSigner } from "wagmi";
+import { Booker as BookerType } from '../../typechain-types';
+import Booker from '../../artifacts/contracts/Booker.sol/Booker.json';
+import { useRouter } from 'next/router';
+import Feedback from './Feedback';
 
 const events = ["ETHBogota", "ETHSanFrancisco"];
+const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
 const fileTypes = ["JPG", "PNG"];
 const projectId = process.env.NEXT_PUBLIC_IPFS_PROJECT_ID;
@@ -30,16 +37,18 @@ const client = create({
 
 export default function Create(props: {onCloseModal: any}){
 
-    const [step, setStep] = useState(1)
     const [link, setLink] = useState("");
     const [price, setPrice] = useState("");
     const [eventName, setEventName] = useState("");
     const [spots, setSpots] = useState("");
-    const [email, setEmail] = useState("");
     const [image, setImage] = useState<any>(null);
-    const [dateRange, setDateRange] = useState({startDate: new Date(), endDate: new Date(), key: 'selection'})
-    const [showCallendar, setShowCallendar] = useState(false)
-    const [loading, setLoading] = useState(false)
+    const [dateRange, setDateRange] = useState({startDate: new Date(), endDate: new Date(), key: 'selection'});
+    const [showCallendar, setShowCallendar] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [ failure, setFailure ] = useState(false);
+
+    const { data: signer } = useSigner();
+    const router = useRouter();
 
     const handleCloseClick = () => {
         props.onCloseModal();
@@ -49,12 +58,55 @@ export default function Create(props: {onCloseModal: any}){
       setImage(image);
     };
 
-    const goToStepTwo = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setLoading(true);
-        setStep(2);
-        setLoading(false);
+    const submitStay = async (e: React.FormEvent<HTMLFormElement>) => {
+      setLoading(true);
+      e.preventDefault();
+      if(!signer) return;
+      const contract = new ethers.Contract('0xb1339D62a1129c9aB146AdA1cEb9760feA24a811', Booker.abi, signer) as BookerType;
+      const subdomain = 'https://staverse.infura-ipfs.io';
+      let imageURL = "";
+      let nftURL = "";
+        try {
+            const imageAdded = await client.add({ content: image });
+            imageURL = `${subdomain}/ipfs/${imageAdded.path}`;
+            const nftMetadata = {
+              image: imageURL,
+              name: eventName,
+              description: `Stay token for ${eventName}`,
+            }
+            const nftAdded = await client.add({ content: JSON.stringify(nftMetadata)});
+            nftURL = `${subdomain}/ipfs/${nftAdded.path}`;
+        } catch (error) {
+          console.log('Error uploading file to IPFS.');
+        }
+        const date = `${(dateRange.startDate).getDate()} ${months[(dateRange.startDate).getMonth()]}-${(dateRange.endDate).getDate()} ${months[(dateRange.endDate).getMonth()]}`
+        await addDoc(collection(db, "Stays"), {
+          link: link,
+          price: price,
+          eventName: eventName,
+          spots: spots,
+          fullNames: [],
+          emails: [],
+          image: imageURL,
+          date: date
+        }).then(async (docRef) => {
+          const costPerPerson = parseInt(price)/parseInt(spots)*1000000;
+          try{
+            const addTx = await contract.addStay(docRef.id, costPerPerson, spots, nftURL);
+            await addTx.wait();
+            props.onCloseModal();
+            router.push(`/stays/${docRef.id}`);
+          }catch{
+            setFailure(true);
+            setTimeout(function(){
+              setFailure(false);
+          }, 2500);
+            console.log("Smart contract tx error");
+          }
+          setLoading(false);
+        });
     }
+
     const handleDateSelect = (ranges:any) => {
       setDateRange({startDate: ranges.selection.startDate, endDate: ranges.selection.endDate, key: 'selection'})
     }
@@ -65,13 +117,11 @@ export default function Create(props: {onCloseModal: any}){
     const addForm = () => {
         return (
           <div>
-            {loading ? 
-              <div className='spinner'></div>
-              :
+            {failure == true && <Feedback close={() => setFailure(false)} type="false"/>}
             <div onClick={(e) => e.stopPropagation()} className="mx-auto sm:rounded-lg border-4 border-black shadow-[20px_20px_0_rgba(0,0,0,1)] cursor-auto">
               <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 " onClick={() => setShowCallendar(false)}>
                 <h2 className="text-center text-3xl font-bold">Add new stay</h2>
-                <form className="space-y-6 py-6" onSubmit={(e) => goToStepTwo(e)} >
+                <form className="space-y-6 py-6" onSubmit={(e) => submitStay(e)} >
                   <div>
                     <label htmlFor="link" className="block text-sm font-medium text-gray-700">
                       Offer link
@@ -191,21 +241,25 @@ export default function Create(props: {onCloseModal: any}){
                       type="submit"
                       className="w-full flex justify-center py-4 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black"
                     >
-                      Add new
+                      {loading ? 
+                      <div className='spinner-white'></div>
+                      :
+                      <p>
+                        Add new
+                      </p>
+                      }
                     </button>
                   </div>
                 </form>
               </div>
-            </div>
-          }          
+            </div>   
           </div>
         )
     }
 
   return(
     <div className='fixed z-50 w-full h-screen flex justify-center items-center backdrop-blur-lg cursor-pointer' onClick={handleCloseClick}>
-          {step === 1 && addForm()}
-          {step === 2 && <AddStay onCloseModal={() => props.onCloseModal(false)} link={link} price={price} dates={dateRange} eventName={eventName} spots={spots} image={image}/>}
+          {addForm()}
     </div>
   )
 };

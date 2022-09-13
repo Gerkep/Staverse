@@ -1,7 +1,8 @@
 import Navbar from "../components/layout/Navbar";
 import Link from "next/link"
-import AddStay from "../components/popups/AddStay";
+import UserDetails from "../components/popups/UserDetails";
 import React, { useState, useEffect } from "react";
+import { useRouter } from 'next/router'
 import Footer from "../components/layout/Footer";
 import { FileUploader } from "react-drag-drop-files";
 import { HiOutlinePhotograph } from "react-icons/hi";
@@ -10,16 +11,34 @@ import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
 import { DateRange } from 'react-date-range';
 import Image from "next/image";
-import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, getDoc, addDoc } from "firebase/firestore";
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 import { db } from "../firebase/clientApp";
 import Loading from "../components/Loading";
 import { IoDesktop, IoLogoDiscord, IoLogoTwitter } from "react-icons/io5";
 import MailchimpSubscribe, { EmailFormFields } from "react-mailchimp-subscribe"
 import NewsletterForm from "../components/layout/NewsletterForm";
+import { create, CID, IPFSHTTPClient } from "ipfs-http-client";
+import { useSigner } from "wagmi";
+import { ethers } from "ethers";
+import { Booker as BookerType } from '../typechain-types';
+import Booker from '../artifacts/contracts/Booker.sol/Booker.json';
+import Feedback from "../components/popups/Feedback";
 const fileTypes = ["JPG", "PNG"];
+const projectId = process.env.NEXT_PUBLIC_IPFS_PROJECT_ID;
+const projectSecret = process.env.NEXT_PUBLIC_IPFS_API_KEY;
+const auth = `Basic ${Buffer.from(`${projectId}:${projectSecret}`).toString('base64')}`;
+const client = create({
+  host: 'ipfs.infura.io',
+  port: 5001,
+  protocol: 'https',
+  headers: {
+    authorization: auth,
+  },
+});
 
 const eventsList = ["ETHBogota", "ETHSanFrancisco"];
+const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
 type EventDetails = {
   organizer: string,
@@ -46,7 +65,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 }
 
 export default function Home({ events }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const [showModal, setShowModal] = useState(false);
   const [link, setLink] = useState("");
   const [price, setPrice] = useState("");
   const [eventName, setEventName] = useState("");
@@ -57,17 +75,64 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(true);
   const [displayGuaranteeInfo, setDisplayGuaranteeInfo ] = useState(false);
+  const [ failure, setFailure ] = useState(false);
 
+
+  const { data: signer } = useSigner();
+  const router = useRouter();
+  
   const handleChange = (image: File) => {
     setImage(image);
   };
 
-  const submitStay = (e: React.FormEvent<HTMLFormElement>) => {
+  const submitStay = async (e: React.FormEvent<HTMLFormElement>) => {
     setLoading(true);
     e.preventDefault();
-    setShowModal(true);
-    setLoading(false);
+    if(!signer) return;
+    const contract = new ethers.Contract('0xb1339D62a1129c9aB146AdA1cEb9760feA24a811', Booker.abi, signer) as BookerType;
+    const subdomain = 'https://staverse.infura-ipfs.io';
+    let imageURL = "";
+    let nftURL = "";
+      try {
+          const imageAdded = await client.add({ content: image });
+          imageURL = `${subdomain}/ipfs/${imageAdded.path}`;
+          const nftMetadata = {
+            image: imageURL,
+            name: eventName,
+            description: `Stay token for ${eventName}`,
+          }
+          const nftAdded = await client.add({ content: JSON.stringify(nftMetadata)});
+          nftURL = `${subdomain}/ipfs/${nftAdded.path}`;
+      } catch (error) {
+        console.log('Error uploading file to IPFS.');
+      }
+      const date = `${(dateRange.startDate).getDate()} ${months[(dateRange.startDate).getMonth()]}-${(dateRange.endDate).getDate()} ${months[(dateRange.endDate).getMonth()]}`
+      await addDoc(collection(db, "Stays"), {
+        link: link,
+        price: price,
+        eventName: eventName,
+        spots: spots,
+        fullNames: [],
+        emails: [],
+        image: imageURL,
+        date: date
+      }).then(async (docRef) => {
+        const costPerPerson = parseInt(price)/parseInt(spots)*1000000;
+        try{
+          const addTx = await contract.addStay(docRef.id, costPerPerson, spots, nftURL);
+          await addTx.wait();
+          router.push(`/stays/${docRef.id}`);
+        }catch{
+          console.log("Smart contract tx error");
+          setFailure(true);
+          setTimeout(function(){
+            setFailure(false);
+        }, 2500);
+        }
+        setLoading(false);
+      });
   }
+
 
   const handleDateSelect = (ranges:any) => {
     console.log(ranges);
@@ -108,6 +173,7 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
     <div onClick={() => setShowCallendar(false)}>
       <Loading />
       <Navbar style="dark" showNav={false}/>
+      {failure == true && <Feedback close={() => setFailure(false)} type="false"/>}
       <div className="lg:w-1/2 lg:h-full fixed mt-28 lg:mt-0 lg:pr-28 w-full flex lg:flex-wrap lg:items-center">
         <div>
             <h1 className="px-8 lg:px-0 mt-4 text-5xl xl:text-7xl text-center lg:text-left lg:ml-8 font-black"><span className="text-indigo-600">Book a stay</span> for your next hack.</h1>
@@ -123,7 +189,6 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
             </div>
           </div>
       </div>
-      {showModal ? <AddStay onCloseModal={() => setShowModal(false)} link={link} price={price} dates={dateRange} eventName={eventName} spots={spots} image={image}/> : '' }
       <div className="polygon h-full w-8/12 hidden lg:block bg-stay2 bg-cover bg-right z-0 shadow-[0px_20px_0_rgba(0,0,0,1)] fixed right-0 top-0 flex items-center">
       <div className="mt-28 absolute right-20 shadow-[20px_20px_0_rgba(0,0,0,1)] border-4 border-black rounded-2xl overflow-hidden">
           <div  className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 ">
@@ -276,41 +341,6 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
       </div>
         {renderEvents()}
     </div>
-    {/* <div className="pt-12 sm:pt-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl lg:text-5xl tracking-tight font-black lg:font-bold text-gray-900 sm:tracking-tight">
-            Trusted by devs from 5 continents
-          </h2>
-          <p className="mt-4 lg:mt-3 text-xl text-gray-500 sm:mt-4">
-            Booking service designed to book accommodation for your next hackathon.
-          </p>
-        </div>
-      </div>
-      <div className="mt-10 pb-12 bg-white sm:pb-24 ">
-        <div className="relative">
-          <div className="absolute inset-0 h-1/2" />
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto flex justify-center w-full">
-              <dl className="w-10/12 py-4 lg:py-0 rounded-lg bg-white shadow-[12px_15px_0_rgba(0,0,0,1)] hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180 border-4 border-black sm:grid sm:grid-cols-3">
-                <div className="flex flex-col border-b border-gray-100 p-6 text-center sm:border-0 sm:border-r">
-                  <dt className="order-2 mt-2 text-lg leading-6 font-medium text-gray-500">Refund Guarantee</dt>
-                  <dd className="order-1 text-5xl tracking-tight font-bold text-indigo-600 ">100%</dd>
-                </div>
-                <div className="flex flex-col border-t border-b border-gray-100 p-6 text-center sm:border-0 sm:border-l sm:border-r">
-                  <dt className="order-2 mt-2 text-lg leading-6 font-medium text-gray-500">Response Time</dt>
-                  <dd className="order-1 text-5xl tracking-tight font-bold text-indigo-600">5 min</dd>
-                </div>
-                <div className="flex flex-col border-t border-gray-100 p-6 text-center sm:border-0 sm:border-l">
-                  <dt className="order-2 mt-2 text-lg leading-6 font-medium text-gray-500">Support</dt>
-                  <dd className="order-1 text-5xl tracking-tight font-bold text-indigo-600">24/7</dd>
-                </div>
-              </dl>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div> */}
     <div className="py-24 lg:py-24 lg:mt-24 lg:bg-subtle-gray">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
