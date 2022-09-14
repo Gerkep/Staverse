@@ -25,6 +25,7 @@ import { Booker as BookerType } from '../typechain-types';
 import Booker from '../artifacts/contracts/Booker.sol/Booker.json';
 import Feedback from "../components/popups/Feedback";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import ScalingElement from "../components/animation/ScalingElement";
 const fileTypes = ["JPG", "PNG"];
 const projectId = process.env.NEXT_PUBLIC_IPFS_PROJECT_ID;
 const projectSecret = process.env.NEXT_PUBLIC_IPFS_API_KEY;
@@ -81,7 +82,7 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
 
   const { data: signer } = useSigner();
   const router = useRouter();
-  
+
   const handleChange = (image: File) => {
     setImage(image);
   };
@@ -173,22 +174,26 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
   return (
     <div onClick={() => setShowCallendar(false)}>
       <Loading />
-      <Navbar style="dark" showNav={false}/>
+      <Navbar style="dark" showNav={false} />
       {failure == true && <Feedback close={() => setFailure(false)} type="false"/>}
       <div className="lg:w-1/2 lg:h-full fixed mt-28 lg:mt-0 lg:pr-28 w-full flex lg:flex-wrap lg:items-center">
         <div>
-            <h1 className="px-8 lg:px-0 mt-4 text-5xl xl:text-7xl text-center lg:text-left lg:ml-8 font-black"><span className="text-indigo-600">Book a stay</span> for your next hack.</h1>
-            <div className="w-full flex justify-center lg:justify-start">
-              <div onMouseOver={() => setDisplayGuaranteeInfo(true)} onMouseLeave={() => setDisplayGuaranteeInfo(false)} className="w-10/12 lg:w-5/6 h-44 bg-center cursor-pointer lg:bg-left bg-guarantee bg-contain bg-no-repeat mt-10 lg:ml-8 lg:mt-12"></div>
-            </div>
+            <ScalingElement><h1 className="px-8 lg:px-0 mt-4 text-5xl xl:text-7xl text-center lg:text-left lg:ml-8 font-black"><span className="text-indigo-600">Book a stay</span> for your next hack.</h1></ScalingElement>
+            <ScalingElement>
+              <div className="w-full flex justify-center lg:justify-start">
+                <div onMouseOver={() => setDisplayGuaranteeInfo(true)} onMouseLeave={() => setDisplayGuaranteeInfo(false)} className="w-10/12 lg:w-5/6 h-44 bg-center cursor-pointer lg:bg-left bg-guarantee bg-contain bg-no-repeat mt-10 lg:ml-8 lg:mt-12"></div>
+              </div>
+            </ScalingElement>
             {displayGuaranteeInfo ? <div className="absolute w-10/12 lg:w-4/6 z-40 ml-8 text-gray-400 py-4 px-8 lg:px-0 lg:py-0 lg:bg-white bg-subtle-gray rounded-xl">100% refund is granted only when the stay is no longer available or not enough money was raised to book it.</div> : ''}
             <div className="w-full lg:w-auto flex lg:block justify-center">
-            <Link href="/events/avUJdtt1DBsbRb23kYWL"><button className="lg:border-4 border-black text-white lg:text-black shadow-[2px_2px_30px_rgba(0,0,0,0.25)] lg:shadow-[12px_12px_0_rgba(0,0,0,1)] font-bold rounded-xl bg-indigo-600 lg:bg-white
-            px-16 xl:px-20 py-6 text-xl lg:text-2xl lg:ml-8 mt-6 lg:mt-16 hover:scale-105 transition ease-in duration-240 hover:scale-105 lg:hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180">
-              Book for Bogota!
-            </button></Link>
+            <ScalingElement>
+              <Link href="/events/avUJdtt1DBsbRb23kYWL"><button className="lg:border-4 border-black text-white lg:text-black shadow-[2px_2px_30px_rgba(0,0,0,0.25)] lg:shadow-[12px_12px_0_rgba(0,0,0,1)] font-bold rounded-xl bg-indigo-600 lg:bg-white
+              px-16 xl:px-20 py-6 text-xl lg:text-2xl lg:ml-8 mt-6 lg:mt-16 hover:scale-105 transition ease-in duration-240 hover:scale-105 lg:hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180">
+                Book for Bogota!
+              </button></Link>
+            </ScalingElement>
             </div>
-          </div>
+        </div>
       </div>
       <div className="polygon h-full w-8/12 hidden lg:block bg-stay2 bg-cover bg-right z-0 shadow-[0px_20px_0_rgba(0,0,0,1)] fixed right-0 top-0 flex items-center">
       <div className="mt-28 absolute right-20 shadow-[20px_20px_0_rgba(0,0,0,1)] border-4 border-black rounded-2xl overflow-hidden">
@@ -340,10 +345,14 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
       <div className="py-24 lg:pt-36 lg:pb-36" id="upcoming">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl lg:text-5xl tracking-tight font-black lg:font-bold text-gray-900 sm:tracking-tight">
+          <ScalingElement>
+          <h2 className="text-4xl lg:text-7xl tracking-tight font-black text-gray-900 sm:tracking-tight">
            Upcoming web3 events
           </h2>
-          <p className="mt-4 font-bold text-indigo-500 text-lg">YOU DO NOT WANT TO MISS</p>
+          </ScalingElement>
+          <ScalingElement>
+            <p className="mt-4 font-bold text-indigo-500 text-lg lg:text-2xl">YOU DO NOT WANT TO MISS</p>
+          </ScalingElement>
         </div>
       </div>
         {renderEvents()}
@@ -351,44 +360,52 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
     <div className="py-24 lg:py-24 lg:mt-24 lg:bg-subtle-gray">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl lg:text-5xl tracking-tight font-black lg:font-bold text-gray-900 sm:tracking-tight">
-           How can I book?
-          </h2>
-          <p className="mt-3 text-xl text-gray-500 sm:mt-4">
-            Find accommodation on your favorite booking service and book with us for crypto.
-          </p>
+          <ScalingElement>
+            <h2 className="text-4xl lg:text-7xl tracking-tight font-black text-gray-900 sm:tracking-tight">
+            How do I book?
+            </h2>
+          </ScalingElement>
+          <ScalingElement>
+            <p className="mt-3 text-xl lg:text-2xl text-gray-500 sm:mt-4">
+              Find accommodation on your favorite booking service and book with us for crypto.
+            </p>
+          </ScalingElement>
         </div>
       </div>
       <div className="flex flex-wrap lg:flex-nowrap lg:mt-8 justify-center py-12 items-center">
-        <div className="w-72 h-96 mt-2 lg:mt-8 bg-white shadow-[12px_15px_0_rgba(0,0,0,1)] border-4 border-black rounded-xl flex flex-wrap justify-center ml-10 mr-10 hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180">
-          <div className="w-full h-40 bg-backblur bg-center bg-cover rounded-md"></div>
-          <div className="w-20 h-20 bg-createIcon bg-center bg-contain bg-no-repeat absolute mt-8"></div>
-          <h3 className="text-center font-black text-3xl ">Add stay</h3>
-          <p className="text-center text-gray-500 lg:text-gray-900 font-bold lg:font-medium text-l w-5/6">Find a stay on service like Airbnb, copy the link and add new offer to our platform.</p>
+        <div className="w-72 py-10 mt-2 lg:mt-8 bg-white shadow-[12px_15px_0_rgba(0,0,0,1)] border-4 border-black rounded-xl flex flex-wrap justify-center ml-10 mr-10 hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180">
+          <div className="w-full h-28 rounded-md"></div>
+          <div className="w-20 h-20 ml-6 bg-createIcon bg-center bg-contain bg-no-repeat absolute"></div>
+          <h3 className="text-center mt-4 font-black text-3xl ">Add stay</h3>
+          <p className="text-center mt-4 text-gray-500 lg:text-gray-900 font-bold lg:font-medium text-l w-5/6">Find a stay on service like Airbnb, copy the link and add new offer to our platform.</p>
         </div>
         <div className="w-14 h-10 hidden lg:block bg-arrow bg-center bg-contain bg-no-repeat ml-6">
         </div>
-        <div className="w-72 h-96 mt-20 lg:mt-8 bg-white shadow-[12px_15px_0_rgba(0,0,0,1)] border-4 border-black rounded-xl flex flex-wrap justify-center ml-10 mr-10 hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180 ">
-          <div className="w-full h-40 bg-backblur bg-center bg-cover rounded-md"></div>
-          <div className="w-20 h-20 bg-sendIcon bg-center bg-contain bg-no-repeat absolute mt-8"></div>
-          <h3 className="text-center font-black text-3xl">Fund it</h3>
-          <p className="text-center text-gray-500 lg:text-gray-900 font-bold lg:font-medium text-l w-5/6">You can book alone or with frens. All funds will be safely stored on a smart contract.</p>
+        <div className="w-72 py-10 mt-20 lg:mt-8 bg-white shadow-[12px_15px_0_rgba(0,0,0,1)] border-4 border-black rounded-xl flex flex-wrap justify-center ml-10 mr-10 hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180 ">
+          <div className="w-full h-28 rounded-md"></div>
+          <div className="w-20 h-20 bg-sendIcon bg-center bg-contain bg-no-repeat absolute"></div>
+          <h3 className="text-center mt-4 font-black text-3xl">Fund it</h3>
+          <p className="text-center mt-4 text-gray-500 lg:text-gray-900 font-bold lg:font-medium text-l w-5/6">You can book alone or with frens. All funds will be safely stored on a smart contract.</p>
         </div>
         <div className="w-14 h-10 hidden lg:block bg-arrow bg-center bg-contain bg-no-repeat ml-6">
         </div>
-        <div className="w-72 h-96 mt-20 lg:mt-8 bg-white shadow-[12px_15px_0_rgba(0,0,0,1)] border-4 border-black rounded-xl flex flex-wrap justify-center ml-10 mr-10 hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180" >
-          <div className="w-full h-40 bg-backblur bg-center bg-cover rounded-md"></div>
-          <div className="w-20 h-20 bg-checkIcon bg-center bg-contain bg-no-repeat absolute mt-8"></div>
-          <h3 className="text-center font-black text-3xl">Book it</h3>
-          <p className="text-center text-gray-500 lg:text-gray-900 font-bold lg:font-medium text-l w-5/6">Once the price target is met you confirm booking and receive details within 24h.</p>
+        <div className="w-72 py-10 mt-20 lg:mt-8 bg-white shadow-[12px_15px_0_rgba(0,0,0,1)] border-4 border-black rounded-xl flex flex-wrap justify-center ml-10 mr-10 hover:scale-105 hover:shadow-[20px_20px_0_rgba(0,0,0,1)] transition ease-in duration-180" >
+          <div className="w-full h-28 rounded-md"></div>
+          <div className="w-20 h-20 bg-checkIcon bg-center bg-contain bg-no-repeat absolute"></div>
+          <h3 className="text-center mt-4 font-black text-3xl">Book it</h3>
+          <p className="text-center mt-4 text-gray-500 lg:text-gray-900 font-bold lg:font-medium text-l w-5/6">Once the price target is met you confirm booking and receive details within 24h.</p>
         </div>
       </div>
     </div>
 
       <div className="w-full flex flex-wrap text-center py:24 lg:pt-36 pb-12 justify-center " id="newsletter">
-      <h2 className="text-4xl lg:text-5xl tracking-tight font-black lg:font-bold text-gray-900 sm:tracking-tight w-full">
-           Behind the scenes
+        <div className="w-full">
+        <ScalingElement>
+          <h2 className="text-4xl lg:text-7xl tracking-tight font-black text-gray-900 sm:tracking-tight w-full">
+              Behind the scenes
           </h2>
+        </ScalingElement>
+        </div>
         <div className="mt-12 w-11/12 lg:w-8/12 pb-12 shadow-[5px_5px_40px_rgba(0,0,0,0.20)] border-4 border-gray-200 rounded-2xl">
           <div className="grid lg:grid-cols-2">
           <div className="w-full flex py-6 px-6">

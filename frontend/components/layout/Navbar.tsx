@@ -1,7 +1,7 @@
 import Link from "next/link"
 import Image from 'next/image'
 import logo from '../../public/img/HH-logo-white.png'
-import blackLogo from '../../public/img/HH-logo-black.png'
+import blackLogo from '../../public/img/staverse-final-logo.png'
 import {  AddIcon } from '@chakra-ui/icons'
 import { useState } from "react"
 import CreateStay from "../popups/CreateStay"
@@ -18,19 +18,13 @@ const Navbar: React.FC<{style:string, showNav: boolean}> = ({style, showNav}) =>
       </div>
       <div className={showNav ? "fixed z-40 lg:z-40 top-0 w-full backdrop-blur flex items-center justify-end py-7 pb-20 lg:pb-6" : "fixed z-40 lg:z-20 top-0 w-full backdrop-blur lg:backdrop-blur-none flex justify-end py-7 pb-20 lg:pb-6"}>
       <Link href="/">
-        <div className="h-10 w-36 inset-x-0 mx-auto lg:mx-2 fixed top-2 lg:top-0 left-2 cursor-pointer hover:scale-105 transition ease-in duration-180">
+        <div className="h-20 w-48 lg:w-48 lg:h-16 inset-x-0 mx-auto lg:mx-2 fixed top-2 lg:top-4 left-2 lg:left-4 cursor-pointer hover:scale-105 transition ease-in duration-180">
             {style === "light" ? 
-            <Image
-                src={logo}
-                alt="logo"
-                layout="responsive"
-            />
+            <div className="w-full h-full bg-logo-mobile-white lg:bg-logo-desktop-white bg-center bg-contain bg-no-repeat">
+            </div>
             :
-            <Image
-                src={blackLogo}
-                alt="logo"
-                layout="responsive"
-            />
+            <div className="w-full h-full bg-logo-mobile-black lg:bg-logo-desktop-black bg-center bg-contain bg-no-repeat">
+            </div>
             }
         </div>
       </Link>

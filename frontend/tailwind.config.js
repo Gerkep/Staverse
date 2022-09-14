@@ -15,6 +15,10 @@ module.exports = {
     },
     backgroundImage: {
       'background': "url('../public/img/staverse-background.png')",
+      'logo-desktop-black': "url('../public/img/staverse-final-logo.png')",
+      'logo-desktop-white': "url('../public/img/staverse-final-logo-w.png')",
+      'logo-mobile-black': "url('../public/img/staverse-center-b.png')",
+      'logo-mobile-white': "url('../public/img/staverse-center-b.png')",
       'backblur': "url('../public/img/back-blur.png')",
       'createIcon': "url('../public/img/create-icon.png')",
       'arrow': "url('../public/img/arrow.png')",
