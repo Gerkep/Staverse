@@ -18,8 +18,6 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
 
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
-  const [step, setStep] = useState(1);
-  const [stayId, setStayId] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [ failure, setFailure ] = useState(false);
 
@@ -88,7 +86,7 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
                 await deleteDoc(doc(db, "Stays", props.stayId));
               }
               setLoading(false);
-              setStep(2);
+              router.push("/success");
             }catch{
               console.log("Smart contract tx error");
               setLoading(false);
@@ -99,14 +97,11 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
             }
           })
     }
-    const backToHome = () => {
-      props.onCloseModal();
-      router.push('/');
-    }
 
-    const stepOne = () => {
-      return (
-        <div className="sm:mx-auto sm:w-full sm:max-w-md rounded-xl border-4 border-black shadow-[20px_20px_0_rgba(0,0,0,1)] cursor-auto">
+
+  return(
+    <div className='fixed z-50 w-full h-screen flex justify-center items-center  backdrop-blur-lg cursor-pointer' onClick={handleCloseClick}>
+              <div className="sm:mx-auto sm:w-full sm:max-w-md rounded-xl border-4 border-black shadow-[20px_20px_0_rgba(0,0,0,1)] cursor-auto">
         {failure == true && 
           <Feedback close={() => setFailure(false)} type="false"/>
         }
@@ -190,35 +185,6 @@ export default function Signin(props: {onCloseModal: any, link: string, price: s
           </form>
         </div>
         </div>
-      )
-    }
-
-    const stepTwo = () => {
-      return (
-        <div className="sm:mx-auto sm:w-full sm:max-w-md sm:rounded-lg border-4 rounded-xl border-black shadow-[20px_20px_0_rgba(0,0,0,1)] cursor-auto">
-        <div className="bg-white py-8 pb-16 px-4 shadow sm:rounded-lg sm:px-10 cursor-auto" onClick={(e) =>  e.stopPropagation()}>
-          <div className='w-full flex justify-center'>
-            <HiOutlineCheckCircle className='w-36 h-36 text-light-green' />
-          </div>
-          <h1 className=' text-center font-bold text-3xl mt-8'>Success!</h1>
-          <div className='flex pb-8 w-full justify-center'>
-              <p className='text-center mt-4 text-gray-500'>You successfully joined this stay! Once all funds are raised we will drop you an email and book it.</p>            
-          </div>
-            <button
-            onClick={() => backToHome()}
-              className="w-full flex justify-center py-4 px-4 border mt-8 border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black"
-            >
-              Go to homepage
-            </button>        
-        </div>
-        </div>
-      )
-    }
-
-  return(
-    <div className='fixed z-50 w-full h-screen flex justify-center items-center  backdrop-blur-lg cursor-pointer' onClick={handleCloseClick}>
-      {step === 1 && stepOne()}
-      {step === 2 && stepTwo()}
     </div>
   )
 };

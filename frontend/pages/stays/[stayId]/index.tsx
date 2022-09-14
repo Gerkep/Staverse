@@ -146,15 +146,15 @@ const copyLink = () => {
             <div className="w-full lg:h-5/6 flex justify-end">
             <div className="w-full lg:w-5/6 lg:h-full border-t-4 border-gray-200 rounded-sm lg:border-4 mt-8 lg:mt-0 pb-8 pt-4 lg-pt-0 lg:pb-0 lg:border-black lg:rounded-xl lg:shadow-[12px_15px_0_rgba(0,0,0,1)]">
                 <div className="w-full grid grid-cols-2">
-                  <h2 className="text-2xl lg:text-3xl font-black ml-4">{stay.eventName}</h2>
+                  <h2 className="text-2xl lg:text-3xl font-black ml-2 lg:ml-4">{stay.eventName}</h2>
                   <div className="w-full flex justify-end">
-                      <HiOutlineDuplicate onClick={() => copyLink()} className="w-10 h-10 mr-4 hover:scale-110 cursor-pointer transition ease-in duration-180"/>
+                      <HiOutlineDuplicate onClick={() => copyLink()} className="w-10 h-10 lg:mr-4 hover:scale-110 cursor-pointer transition ease-in duration-180"/>
                       {copyMessage ? <div className="absolute mt-10 mr-4 py-2 px-4 bg-subtle-gray rounded-md">Link copied!</div> : ''}
                   </div>
                 </div>
-                <a href={`${stay.link}`} className="mt-2 lg:mt-4 ml-4 underline text-gray-400">Link to offer</a>
+                <a href={`${stay.link}`} className="mt-2 lg:mt-4 ml-2 lg:ml-4 underline text-gray-400">Link to offer</a>
                 <div className="flex justify-center">
-                  <div className="w-11/12 h-40 mt-6 lg:mt-16 border-4 border-gray-200 rounded-xl grid grid-cols-2 grid-rows-2">
+                  <div className="w-full lg:w-11/12 h-40 mt-6 lg:mt-16 border-4 border-gray-200 rounded-xl grid grid-cols-2 grid-rows-2">
                       <div className="border-b-4 border-r-4 pt-2 border-gray-200">
                           <label className="text-xs lg:text-md font-black ml-4 mt-4 w-full">CHECK-IN</label>
                           {stay.date && <p className="ml-4 mt-1 text-gray-400">{(stay.date.split('-'))[0]}</p>}
@@ -193,16 +193,28 @@ const copyLink = () => {
                     <p className="text-gray-400 mt-2 text-sm">If you resign you will get 95% money back.</p>
                 </div>
                 :
-                <div>
-                  <div className="w-full grid grid-cols-2 mt-6 lg:mt-20">
-                    <h2 className="text-xl ml-5 ">You Pay: </h2>
+                <div className="mt-6 lg:mt-10">
+                <div className="w-full grid grid-cols-2 mt-2 lg:mt-2 text-sm text-gray-500">
+                    <h2 className="lg:ml-6 ">Booking price: </h2>
                     <div className="w-full flex justify-end">
-                      <div className="mr-5 text-xl font-bold lg:font-medium lg:text-2xl flex items-center"><div className="bg-USDC w-6 h-6 bg-contain bg-center bg-no-repeat mr-2"></div>${((parseInt(stay.price)/parseInt(stay.spots))*1.04).toFixed(2)}</div>
+                      <div className="lg:mr-6 flex items-center">${((parseInt(stay.price)/parseInt(stay.spots))).toFixed(2)}</div>
+                    </div>
+                </div>
+               <div className="w-full grid grid-cols-2 mt-2 lg:mt-2 text-sm text-gray-500">
+                    <h2 className="lg:ml-6 ">Service fee: </h2>
+                    <div className="w-full flex justify-end">
+                      <div className="lg:mr-6 flex items-center">${((parseInt(stay.price)/parseInt(stay.spots))*0.03).toFixed(2)}</div>
+                    </div>
+                </div>
+                  <div className="w-full grid grid-cols-2 mt-2 lg:mt-2">
+                    <h2 className="text-xl lg:ml-6 ">Total: </h2>
+                    <div className="w-full flex justify-end">
+                      <div className="lg:mr-6 text-xl font-bold lg:font-medium lg:text-2xl flex items-center"><div className="bg-USDC w-6 h-6 bg-contain bg-center bg-no-repeat mr-1"></div>{((parseInt(stay.price)/parseInt(stay.spots))*1.03).toFixed(2)}</div>
                     </div>
                   </div>
                   <div className="flex justify-center w-full mt-2">
                     {approved ? 
-                      <button onClick={() => joinStay()} className="w-11/12 bg-indigo-600 py-4 flex justify-center rounded-xl font-bold text-white cursor-pointer">
+                      <button onClick={() => joinStay()} className="w-full lg:w-11/12 bg-indigo-600 py-4 flex justify-center rounded-xl font-bold text-white cursor-pointer">
                       {loading ? 
                       <div className='spinner-white'></div>
                       :
@@ -212,7 +224,7 @@ const copyLink = () => {
                       }
                     </button> 
                     :
-                    <button onClick={() => approveERC20()} className="w-11/12 flex justify-center bg-indigo-600 py-4 rounded-xl font-bold text-white cursor-pointer">
+                    <button onClick={() => approveERC20()} className="w-full lg:w-11/12 flex justify-center bg-indigo-600 py-4 rounded-xl font-bold text-white cursor-pointer">
                       {loading ? 
                       <div className='spinner-white'></div>
                       :

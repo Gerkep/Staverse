@@ -29,6 +29,7 @@ module.exports = {
       'NYCProfile': "url('../public/img/NYC_profile.jpg')",
       'guarantee': "url('../public/img/guarantee.png')",
       'USDC': "url('../public/img/USDC.png')",
+      'staySuccess': "url('../public/img/stay-success.png')"
     },
     spacing: {
       '32': '32rem',

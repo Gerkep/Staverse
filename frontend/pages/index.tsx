@@ -24,6 +24,7 @@ import { ethers } from "ethers";
 import { Booker as BookerType } from '../typechain-types';
 import Booker from '../artifacts/contracts/Booker.sol/Booker.json';
 import Feedback from "../components/popups/Feedback";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 const fileTypes = ["JPG", "PNG"];
 const projectId = process.env.NEXT_PUBLIC_IPFS_PROJECT_ID;
 const projectSecret = process.env.NEXT_PUBLIC_IPFS_API_KEY;
@@ -311,7 +312,8 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
                 }
               </FileUploader>
 
-              <div>
+              <div className="w-full flex justify-center">
+              {signer ?
                 <button
                   type="submit"
                   className="w-full flex justify-center py-4 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-black"
@@ -324,6 +326,11 @@ export default function Home({ events }: InferGetServerSidePropsType<typeof getS
                 </p>
                 }
                 </button>
+                :
+                <div className="mt-4">
+                  <ConnectButton/>
+                </div>
+                }
               </div>
             </form>
           </div>
