@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { CloseIcon } from '@chakra-ui/icons';
 import { useState } from 'react';
 import { doc, collection, addDoc} from "firebase/firestore"; 
@@ -44,12 +44,23 @@ export default function Create(props: {onCloseModal: any}){
     const [image, setImage] = useState<any>(null);
     const [dateRange, setDateRange] = useState({startDate: new Date(), endDate: new Date(), key: 'selection'});
     const [showCallendar, setShowCallendar] = useState(false);
+    const [ dateError, setDateError ] = useState(false);
+    const [ eventError, setEventError ] = useState(false);
     const [loading, setLoading] = useState(false);
     const [ failure, setFailure ] = useState(false);
 
     const { data: signer } = useSigner();
     const router = useRouter();
 
+    useEffect(() => {
+      if(dateRange.startDate.getTime() == dateRange.endDate.getTime()){
+        setDateError(false);
+      }
+      if(eventName){
+        setEventError(false);
+      }
+    }, [eventName, dateRange])
+    
     const handleCloseClick = () => {
         props.onCloseModal();
     };
@@ -61,6 +72,18 @@ export default function Create(props: {onCloseModal: any}){
     const submitStay = async (e: React.FormEvent<HTMLFormElement>) => {
       setLoading(true);
       e.preventDefault();
+      if(dateRange.startDate.getTime() == dateRange.endDate.getTime()){
+        setDateError(true);
+        setLoading(false);
+        return;
+      }
+      if(!eventName){
+        setLoading(false);
+        setEventError(true);
+        return;
+      }
+      setDateError(false);
+      setEventError(false);
       if(!signer) return;
       const contract = new ethers.Contract('0xb1339D62a1129c9aB146AdA1cEb9760feA24a811', Booker.abi, signer) as BookerType;
       const subdomain = 'https://staverse.infura-ipfs.io';
@@ -146,7 +169,8 @@ export default function Create(props: {onCloseModal: any}){
                         Dates
                       </label>
                       <div className="mt-1" onClick={(e) => displayCallendar(e)}>
-                        <div  className="appearance-none cursor-pointer block w-5/6 px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                      <div  className={dateError ? "appearance-none cursor-pointer block w-5/6 px-3 py-2 border border-red-300 rounded-md shadow-sm placeholder-red-400 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm" : 
+                    "appearance-none cursor-pointer block w-5/6 px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"}>
                           {(dateRange.startDate).getDate() !== (dateRange.endDate).getDate() ?
                           <div>
                             {(dateRange.startDate).getDate()}/{(dateRange.startDate).getMonth() + 1}-
@@ -196,7 +220,7 @@ export default function Create(props: {onCloseModal: any}){
                         Event
                       </label>
                       <div className="mt-1 w-5/6" >
-                        <Dropdown values={events} onChange={setEventName}/>
+                        <Dropdown values={events} onChange={setEventName} error={eventError}/>
                       </div>
                     </div>
                     <div>

@@ -3,7 +3,7 @@ import { Listbox, Transition } from '@headlessui/react'
 import { HiCheck, HiChevronDown } from 'react-icons/hi'
 
 
-export default function Dropdown({values, value, onChange}: any) {
+export default function Dropdown({values, value, onChange, error}: any) {
   const [selected, setSelected] = useState('');
 
   const handleChange = (value: string) => {
@@ -16,11 +16,12 @@ export default function Dropdown({values, value, onChange}: any) {
   return (
       <Listbox value={selected} onChange={handleChange}>
         <div className="relative mt-1 z-40">
-          <Listbox.Button className=" appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+          <Listbox.Button className={error ? "appearance-none block w-full px-3 py-2 border border-red-300 rounded-md shadow-sm placeholder-red-400 focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm" :
+           "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"}>
             <span className="block truncate text-left">{selected ? selected : <div className='text-gray-400'>Select</div>}</span>
             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
               <HiChevronDown
-                className="h-5 w-5 text-gray-400"
+                className={error ? "h-5 w-5 text-red-300" :"h-5 w-5 text-gray-400"}
                 aria-hidden="true"
               />
             </span>
